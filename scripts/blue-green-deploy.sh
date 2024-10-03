@@ -6,7 +6,7 @@
 cd /home/hong/app/pricewagon-blue-green
 
 DOCKER_APP_NAME=pricewagon
-DEPLOY_LOG="/home/hong/app/blue-green-deploy.log"  # 로그 파일 경로를 변수로 설정
+DEPLOY_LOG="/home/hong/app/pricewagon-blue-green/blue-green-deploy.log"  # 로그 파일 경로를 변수로 설정
 NGINX_BLUE_CONFIG="/home/hong/app/pricewagon-blue-green/nginx.blue.conf"  # Blue용 Nginx 설정 파일
 NGINX_GREEN_CONFIG="/home/hong/app/pricewagon-blue-green/nginx.green.conf"  # Green용 Nginx 설정 파일
 NGINX_CONFIG="/etc/nginx/nginx.conf"  # 컨테이너 내부의 Nginx 설정 파일 경로
