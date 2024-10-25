@@ -42,4 +42,11 @@ public class Alarm extends BaseEntity {
 	@Column(nullable= false)
 	private AlarmStatus status;
 
+	@Column(nullable = false)
+	private String url;
+
+	@Column(nullable = false)
+	private String content;
+
+
 }
