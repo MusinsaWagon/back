@@ -16,7 +16,7 @@ import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo;
 import com.pricewagon.pricewagon.domain.product.entity.Product;
 import com.pricewagon.pricewagon.domain.product.entity.ShopType;
-import com.pricewagon.pricewagon.domain.product.repository.ProductRepository;
+import com.pricewagon.pricewagon.domain.product.repository.product.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,8 +31,8 @@ public class ProductService {
 
 	// 쇼핑몰에 따른 상품 리스트 조회
 	@Transactional(readOnly = true)
-	public List<BasicProductInfo> getProductsByShopType(ShopType shopType, Pageable pageable) {
-		List<Product> products = productRepository.findAllByShopType(shopType, pageable).getContent();
+	public List<BasicProductInfo> getProductsByShopType(ShopType shopType, Integer lastId, int size) {
+		List<Product> products = productRepository.findProductsByShopTypeAndLastId(shopType, lastId, size);
 
 		return products.stream()
 			.map(product -> {
@@ -41,6 +41,7 @@ public class ProductService {
 			})
 			.toList();
 	}
+
 
 	// 개별 상품 정보 조회
 	@Transactional(readOnly = true)
@@ -61,7 +62,7 @@ public class ProductService {
 	}
 
 	// 쇼핑몰, 카테고리, 페이지 수로 상품 리스트 조회
-	public List<BasicProductInfo> getBasicProductsByCategory(ShopType shopType, Pageable pageable, Long parentCategoryId) {
+	public List<BasicProductInfo> getBasicProductsByCategory(ShopType shopType, Pageable pageable, Integer parentCategoryId) {
 
 		// 상위 카테고리
 		Category parentCategory = categoryService.getCategoryById(parentCategoryId);
@@ -70,7 +71,7 @@ public class ProductService {
 		subCategories.add(parentCategory);
 
 		// 카테고리 전체 목록 생성
-		List<Long> categoriesId = new ArrayList<>();
+		List<Integer> categoriesId = new ArrayList<>();
 		for (Category category : subCategories) {
 			categoriesId.add(category.getId());
 		}
@@ -85,6 +86,7 @@ public class ProductService {
 	}
 
 	public void registerProductURL(ProductUrlRequest request) {
+
 
 	}
 }
