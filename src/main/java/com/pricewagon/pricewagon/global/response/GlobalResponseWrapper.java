@@ -11,7 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-@RestControllerAdvice(basePackages = "price wagon.price wagon")
+@RestControllerAdvice(basePackages = "com.pricewagon.pricewagon")
 public class GlobalResponseWrapper implements ResponseBodyAdvice<Object> {
 	@Override
 	public boolean supports(MethodParameter returnType, Class converterType) {
