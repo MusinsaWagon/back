@@ -5,30 +5,15 @@
 # 작업 디렉토리 설정
 cd /home/hong/app/pricewagon-blue-green
 
-# DOCKER_APP_NAME이 비어있으면 기본값을 설정
 DOCKER_APP_NAME=pricewagon
-
-DEPLOY_LOG="/home/hong/app/blue-green-deploy.log"  # 로그 파일 경로를 변수로 설정
-
-# Nginx 컨테이너 내부의 설정 파일 경로
-NGINX_CONFIG="/etc/nginx/nginx.conf"
+DEPLOY_LOG="/home/hong/app/pricewagon-blue-green/blue-green-deploy.log"  # 로그 파일 경로를 변수로 설정
+NGINX_BLUE_CONFIG="/home/hong/app/pricewagon-blue-green/nginx.blue.conf"  # Blue용 Nginx 설정 파일
+NGINX_GREEN_CONFIG="/home/hong/app/pricewagon-blue-green/nginx.green.conf"  # Green용 Nginx 설정 파일
+NGINX_CONFIG="/etc/nginx/nginx.conf"  # 컨테이너 내부의 Nginx 설정 파일 경로
 
 # 실행 중인 blue가 있는지 확인
 EXIST_BLUE=$(docker-compose -p ${DOCKER_APP_NAME}-blue -f docker-compose.yml ps | grep spring-blue-container | grep Up)
-# Nginx 컨테이너가 이미 실행 중인지 확인
-EXIST_NGINX=$(docker ps --filter "name=nginx-proxy" --filter "status=running" -q)
 
-
-# 현재 실행 중인 컨테이너가 Blue인지 Green인지 확인하여 Nginx 설정 변경
-if [ -z "$EXIST_BLUE" ]; then
-    # Blue가 실행 중이 아닌 경우 Nginx 설정을 Blue로 변경
-    docker exec nginx-proxy sed -i 's/spring-green-container:8080/spring-blue-container:8080/g' $NGINX_CONFIG
-else
-    # Green이 실행 중인 경우 Nginx 설정을 Green으로 변경
-    docker exec nginx-proxy sed -i 's/spring-blue-container:8080/spring-green-container:8080/g' $NGINX_CONFIG
-fi
-
-# 배포 시작한 날짜와 시간을 기록
 echo "배포 시작일자 : $(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)" >> $DEPLOY_LOG
 
 # green이 실행중이면 blue up
@@ -50,18 +35,14 @@ if [ -z "$EXIST_BLUE" ]; then
   if [ -z "$BLUE_HEALTH" ]; then
     echo "blue 배포 도중 실패 : $(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)" >> $DEPLOY_LOG
   else
-
-    # Nginx가 실행 중이지 않으면 시작
-    if [ -z "$EXIST_NGINX" ]; then
-      echo "Nginx 처음 실행 중..." >> $DEPLOY_LOG
-      docker-compose -p ${DOCKER_APP_NAME} -f docker-compose.yml up -d --build nginx
-      echo "Nginx Cerbot SSL 적용 중 ..." >> $DEPLOY_LOG
-      ./ssl.sh
+    # Blue 컨테이너가 실행 중이므로 Blue용 Nginx 설정 파일을 복사
+    echo "Nginx 리로드 시작일자 :  $(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)" >> $DEPLOY_LOG
+    if ! ERROR_LOG=$(docker cp $NGINX_BLUE_CONFIG nginx-proxy:$NGINX_CONFIG 2>&1); then
+        echo "Nginx 설정 복사 실패: $(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)" >> $DEPLOY_LOG
     fi
-
-    # Nginx 재시작 또는 설정 리로드
-    echo "Nginx 리로드 시작일자 : $(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)" >> $DEPLOY_LOG
-    docker exec nginx-proxy nginx -s reload
+    if ! ERROR_LOG=$(docker exec nginx-proxy nginx -s reload 2>&1); then
+        echo "Nginx 리로드 실패:  $(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)" >> $DEPLOY_LOG
+    fi
 
     echo "green 중단 시작 : $(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)" >> $DEPLOY_LOG
     docker-compose -p ${DOCKER_APP_NAME}-green -f docker-compose.yml stop spring-green
@@ -85,18 +66,14 @@ else
   if [ -z "$GREEN_HEALTH" ]; then
     echo "green 배포 도중 실패 : $(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)" >> $DEPLOY_LOG
   else
-
-    # Nginx가 실행 중이지 않으면 시작
-    if [ -z "$EXIST_NGINX" ]; then
-      echo "Nginx 처음 실행 중..." >> $DEPLOY_LOG
-      docker-compose -p ${DOCKER_APP_NAME} -f docker-compose.yml up -d --build nginx
-      echo "Nginx Cerbot SSL 적용 중 ..." >> $DEPLOY_LOG
-      ./ssl.sh
+    # Blue 컨테이너가 실행 중이므로 Blue용 Nginx 설정 파일을 복사
+    echo "Nginx 리로드 시작일자 :  $(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)" >> $DEPLOY_LOG
+    if ! ERROR_LOG=$(docker cp $NGINX_GREEN_CONFIG nginx-proxy:$NGINX_CONFIG 2>&1); then
+        echo "Nginx 설정 복사 실패:  $(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)" >> $DEPLOY_LOG
     fi
-
-    # Nginx 재시작 또는 설정 리로드
-    echo "Nginx 리로드 시작일자 : $(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)" >> $DEPLOY_LOG
-    docker exec nginx-proxy nginx -s reload
+    if ! ERROR_LOG=$(docker exec nginx-proxy nginx -s reload 2>&1); then
+        echo "Nginx 리로드 실패:  $(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)" >> $DEPLOY_LOG
+    fi
 
     echo "blue 중단 시작 : $(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)" >> $DEPLOY_LOG
     docker-compose -p ${DOCKER_APP_NAME}-blue -f docker-compose.yml stop spring-blue
@@ -105,7 +82,6 @@ else
   fi
 
 fi
-
 echo "배포 종료  : $(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)" >> $DEPLOY_LOG
 echo "===================== 배포 완료 =====================" >>  $DEPLOY_LOG
 echo >>  $DEPLOY_LOG
