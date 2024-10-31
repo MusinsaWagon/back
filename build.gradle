@@ -41,7 +41,6 @@ dependencies {
 	annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
 	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
 
-	// 추가 의존성: javax.annotation을 JDK 9 이상에서 사용할 수 있도록 함
 	implementation 'javax.annotation:javax.annotation-api:1.3.2'
 
 	// JMH dependencies - 최신 버전으로 업데이트

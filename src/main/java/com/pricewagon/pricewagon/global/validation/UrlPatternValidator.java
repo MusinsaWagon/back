@@ -1,4 +1,4 @@
-package com.pricewagon.pricewagon.global;
+package com.pricewagon.pricewagon.global.validation;
 
 import com.pricewagon.pricewagon.domain.product.dto.request.ProductUrlRequest;
 import com.pricewagon.pricewagon.domain.product.entity.ShopType;
