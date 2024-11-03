@@ -1,0 +1,62 @@
+package com.pricewagon.pricewagon.domain.product.entity;
+
+import org.hibernate.annotations.Comment;
+
+import com.pricewagon.pricewagon.domain.common.CreatedTimeEntity;
+import com.pricewagon.pricewagon.domain.product.dto.request.ProductUrlRequest;
+import com.pricewagon.pricewagon.domain.product.entity.type.Shop;
+import com.pricewagon.pricewagon.domain.product.entity.type.Status;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ProductRegistration extends CreatedTimeEntity {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+
+	@Comment("쇼핑몰 타입")
+	@Enumerated(EnumType.STRING)
+	@Column(length = 50, nullable = false)
+	private Shop shop;
+
+	@Comment("등록 상품 URL")
+	@Column(nullable = false, length = 200)
+	private String url;
+
+	@Comment("처리 상태")
+	@Enumerated(EnumType.STRING)
+	@Column(length = 10, nullable = false)
+	private Status status;
+
+	@Builder(access = AccessLevel.PRIVATE)
+	private ProductRegistration(
+		Shop shop,
+		String url
+	) {
+		this.shop = shop;
+		this.url = url;
+		this.status = Status.PENDING;
+	}
+
+	public static ProductRegistration create(
+		ProductUrlRequest request
+	) {
+		return ProductRegistration.builder()
+			.shop(request.shop())
+			.url(request.url())
+			.build();
+	}
+}
