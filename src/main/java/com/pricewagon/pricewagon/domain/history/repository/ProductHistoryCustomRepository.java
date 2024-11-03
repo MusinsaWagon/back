@@ -1,8 +1,8 @@
-package com.pricewagon.pricewagon.domain.product.repository.producthistory;
+package com.pricewagon.pricewagon.domain.history.repository;
 
 import java.util.Optional;
 
-import com.pricewagon.pricewagon.domain.product.entity.ProductHistory;
+import com.pricewagon.pricewagon.domain.history.entity.ProductHistory;
 
 public interface ProductHistoryCustomRepository {
 	Optional<ProductHistory> findFirstByProductIdAndPriceNot(Integer productId, Integer currentPrice);

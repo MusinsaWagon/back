@@ -1,4 +1,4 @@
-package com.pricewagon.pricewagon.domain.product.repository.productdetail;
+package com.pricewagon.pricewagon.domain.product.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
