@@ -1,9 +1,10 @@
-package com.pricewagon.pricewagon.domain.product.entity;
+package com.pricewagon.pricewagon.domain.history.entity;
 
 import org.hibernate.annotations.Comment;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.pricewagon.pricewagon.domain.common.BaseEntity;
+import com.pricewagon.pricewagon.domain.common.CreatedDateEntity;
+import com.pricewagon.pricewagon.domain.product.entity.Product;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProductHistory extends BaseEntity {
+public class ProductHistory extends CreatedDateEntity {
 	@Id
 	@JsonIgnore
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

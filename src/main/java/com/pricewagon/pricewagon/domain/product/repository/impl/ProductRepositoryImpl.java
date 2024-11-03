@@ -1,4 +1,4 @@
-package com.pricewagon.pricewagon.domain.product.repository;
+package com.pricewagon.pricewagon.domain.product.repository.impl;
 
 import static com.pricewagon.pricewagon.domain.product.entity.QProduct.*;
 
@@ -7,8 +7,8 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import com.pricewagon.pricewagon.domain.product.entity.Product;
-import com.pricewagon.pricewagon.domain.product.entity.ShopType;
-import com.pricewagon.pricewagon.domain.product.repository.product.ProductRepositoryCustom;
+import com.pricewagon.pricewagon.domain.product.entity.type.Shop;
+import com.pricewagon.pricewagon.domain.product.repository.ProductRepositoryCustom;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -20,7 +20,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	@Override
-	public List<Product> findProductsByShopTypeAndLastId(ShopType shopType, Integer lastId, int size) {
+	public List<Product> findProductsByShopAndLastId(Shop shop, Integer lastId, int size) {
 		// QueryDSL을 사용하여 동적 쿼리 작성 및 실행
 		return jpaQueryFactory
 			.selectFrom(product)
