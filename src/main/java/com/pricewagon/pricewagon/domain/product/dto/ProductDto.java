@@ -3,7 +3,7 @@ package com.pricewagon.pricewagon.domain.product.dto;
 import java.math.BigDecimal;
 
 import com.pricewagon.pricewagon.domain.product.entity.Product;
-import com.pricewagon.pricewagon.domain.product.entity.ShopType;
+import com.pricewagon.pricewagon.domain.product.entity.type.Shop;
 
 public record ProductDto(
 	Integer id,
@@ -15,7 +15,7 @@ public record ProductDto(
 	BigDecimal starScore,
 	Integer reviewCount,
 	Integer likeCount,
-	ShopType shopType
+	Shop shop
 ) {
 	public static ProductDto toDTO(Product product) {
 		return new ProductDto(
@@ -28,7 +28,7 @@ public record ProductDto(
 			product.getStarScore(),
 			product.getReviewCount(),
 			product.getLikeCount(),
-			product.getShopType()
+			product.getShop()
 		);
 	}
 }

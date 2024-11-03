@@ -12,8 +12,8 @@ import org.springframework.data.domain.Pageable;
 
 import com.pricewagon.pricewagon.domain.product.dto.ProductDto;
 import com.pricewagon.pricewagon.domain.product.entity.Product;
-import com.pricewagon.pricewagon.domain.product.entity.ShopType;
-import com.pricewagon.pricewagon.domain.product.repository.product.ProductRepository;
+import com.pricewagon.pricewagon.domain.product.entity.type.Shop;
+import com.pricewagon.pricewagon.domain.product.repository.ProductRepository;
 
 @SpringBootTest
 class ProductServiceTest {
@@ -26,24 +26,24 @@ class ProductServiceTest {
 	 */
 	@Test
 	void comparePagingPerformance() {
-		ShopType shopType = ShopType.MUSINSA;
+		Shop shop = Shop.MUSINSA;
 		int pageSize = 10;
 
 		// Offset 방식 첫 페이지 성능 테스트
 		long offsetFirstPageStartTime = System.currentTimeMillis();
 		Pageable firstPageable = PageRequest.of(0, pageSize);
-		List<Product> offsetFirstPageProducts = productRepository.findAllByShopType(shopType, firstPageable).getContent();
+		List<Product> offsetFirstPageProducts = productRepository.findAllByShop(shop, firstPageable).getContent();
 		long offsetFirstPageEndTime = System.currentTimeMillis();
 
 		// Offset 방식 마지막 페이지 성능 테스트
 		long offsetLastPageStartTime = System.currentTimeMillis();
 		Pageable lastPageable = PageRequest.of(14990, pageSize);
-		List<Product> offsetLaststPageProducts = productRepository.findAllByShopType(shopType, lastPageable).getContent();
+		List<Product> offsetLaststPageProducts = productRepository.findAllByShop(shop, lastPageable).getContent();
 		long offsetLastPageEndTime = System.currentTimeMillis();
 
 		// No-Offset 방식 성능 테스트 (처음에는 lastId가 null로 시작)
 		long noOffsetStartTime = System.currentTimeMillis();
-		List<Product> noOffsetProducts =  productRepository.findProductsByShopTypeAndLastId(shopType, 149990, pageSize);
+		List<Product> noOffsetProducts =  productRepository.findProductsByShopAndLastId(shop, 149990, pageSize);
 		long noOffsetEndTime = System.currentTimeMillis();
 
 
