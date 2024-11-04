@@ -1,7 +1,7 @@
 package com.pricewagon.pricewagon.global.validation;
 
 import com.pricewagon.pricewagon.domain.product.dto.request.ProductUrlRequest;
-import com.pricewagon.pricewagon.domain.product.entity.ShopType;
+import com.pricewagon.pricewagon.domain.product.entity.type.Shop;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -9,26 +9,26 @@ import jakarta.validation.ConstraintValidatorContext;
 public class UrlPatternValidator implements ConstraintValidator<ValidUrlPattern, ProductUrlRequest> {
 	@Override
 	public boolean isValid(ProductUrlRequest value, ConstraintValidatorContext context) {
-		if (value == null || value.url() == null || value.shopType() == null) {
+		if (value == null || value.url() == null || value.shop() == null) {
 			return false;
 		}
 		String url = value.url();
-		ShopType shopType = value.shopType();
+		Shop shop = value.shop();
 		String regex = "";
 
-		// 쇼핑몰별 URL 패턴 설정
-		switch (shopType) {
+		// 쇼핑몰별 URL 패턴 설정 (숫자 6~10자리)
+		switch (shop) {
 			case MUSINSA:
-				regex = "https://www\\.musinsa\\.com/products/\\d+";
+				regex = "^https://www\\.musinsa\\.com/products/\\d{6,10}$";
 				break;
 			case ABLY:
-				regex = "https://m\\.a-bly\\.com/goods/\\d+";
+				regex = "^https://m\\.a-bly\\.com/goods/\\d{6,10}$";
 				break;
 			case BRANDI:
-				regex = "https://www\\.brandi\\.co\\.kr/products/\\d+";
+				regex = "^https://www\\.brandi\\.co\\.kr/products/\\d{6,10}$";
 				break;
 			case ZIGZAG:
-				regex = "https://zigzag\\.kr/catalog/\\d+";
+				regex = "^https://zigzag\\.kr/catalog/\\d{6,10}$";
 				break;
 			default:
 				return false;

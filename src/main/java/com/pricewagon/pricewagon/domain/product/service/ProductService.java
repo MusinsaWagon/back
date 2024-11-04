@@ -11,12 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.pricewagon.pricewagon.domain.category.dto.response.ParentAndChildCategoryDTO;
 import com.pricewagon.pricewagon.domain.category.entity.Category;
 import com.pricewagon.pricewagon.domain.category.service.CategoryService;
-import com.pricewagon.pricewagon.domain.product.dto.request.ProductUrlRequest;
+import com.pricewagon.pricewagon.domain.history.service.ProductHistoryService;
 import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo;
 import com.pricewagon.pricewagon.domain.product.entity.Product;
-import com.pricewagon.pricewagon.domain.product.entity.ShopType;
-import com.pricewagon.pricewagon.domain.product.repository.product.ProductRepository;
+import com.pricewagon.pricewagon.domain.product.entity.type.Shop;
+import com.pricewagon.pricewagon.domain.product.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,8 +31,8 @@ public class ProductService {
 
 	// 쇼핑몰에 따른 상품 리스트 조회
 	@Transactional(readOnly = true)
-	public List<BasicProductInfo> getProductsByShopType(ShopType shopType, Integer lastId, int size) {
-		List<Product> products = productRepository.findProductsByShopTypeAndLastId(shopType, lastId, size);
+	public List<BasicProductInfo> getProductsByShopType(Shop shop, Integer lastId, int size) {
+		List<Product> products = productRepository.findProductsByShopAndLastId(shop, lastId, size);
 
 		return products.stream()
 			.map(product -> {
@@ -42,11 +42,10 @@ public class ProductService {
 			.toList();
 	}
 
-
 	// 개별 상품 정보 조회
 	@Transactional(readOnly = true)
-	public ResponseEntity<IndividualProductInfo> getIndividualProductInfo(ShopType shopType, Integer productNumber) {
-		Product product = productRepository.findByShopTypeAndProductNumber(shopType, productNumber)
+	public ResponseEntity<IndividualProductInfo> getIndividualProductInfo(Shop shop, Integer productNumber) {
+		Product product = productRepository.findByShopAndProductNumber(shop, productNumber)
 			.orElseThrow(() -> new RuntimeException("존재하지 않는 상품입니다."));
 
 		Category childCategory = product.getCategory();
@@ -56,13 +55,15 @@ public class ProductService {
 		Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
 		BasicProductInfo basicProductInfo = BasicProductInfo.createHistoryOf(product, previousPrice);
 
-		IndividualProductInfo individualProductInfo = IndividualProductInfo.from(product, basicProductInfo, parentAndChildCategoryDTO);
+		IndividualProductInfo individualProductInfo = IndividualProductInfo.from(product, basicProductInfo,
+			parentAndChildCategoryDTO);
 
 		return ResponseEntity.ok(individualProductInfo);
 	}
 
 	// 쇼핑몰, 카테고리, 페이지 수로 상품 리스트 조회
-	public List<BasicProductInfo> getBasicProductsByCategory(ShopType shopType, Pageable pageable, Integer parentCategoryId) {
+	public List<BasicProductInfo> getBasicProductsByCategory(Shop shop, Pageable pageable,
+		Integer parentCategoryId) {
 
 		// 상위 카테고리
 		Category parentCategory = categoryService.getCategoryById(parentCategoryId);
@@ -76,7 +77,7 @@ public class ProductService {
 			categoriesId.add(category.getId());
 		}
 
-		return productRepository.findByShopTypeAndCategory_IdIn(shopType, categoriesId, pageable)
+		return productRepository.findByShopAndCategory_IdIn(shop, categoriesId, pageable)
 			.stream()
 			.map(product -> {
 				Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
@@ -85,8 +86,4 @@ public class ProductService {
 			.toList();
 	}
 
-	public void registerProductURL(ProductUrlRequest request) {
-
-
-	}
 }
