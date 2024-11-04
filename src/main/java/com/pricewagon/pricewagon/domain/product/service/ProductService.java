@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,11 +13,13 @@ import com.pricewagon.pricewagon.domain.category.dto.response.ParentAndChildCate
 import com.pricewagon.pricewagon.domain.category.entity.Category;
 import com.pricewagon.pricewagon.domain.category.service.CategoryService;
 import com.pricewagon.pricewagon.domain.history.service.ProductHistoryService;
+import com.pricewagon.pricewagon.domain.product.dto.ProductDto;
 import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo;
 import com.pricewagon.pricewagon.domain.product.entity.Product;
 import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 import com.pricewagon.pricewagon.domain.product.repository.ProductRepository;
+import com.pricewagon.pricewagon.domain.product.specification.ProductSpecification;
 
 import lombok.RequiredArgsConstructor;
 
@@ -83,6 +86,16 @@ public class ProductService {
 				Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
 				return BasicProductInfo.createHistoryOf(product, previousPrice);
 			})
+			.toList();
+	}
+
+	public List<ProductDto> searchProducts(String name, String brand) {
+		Specification<Product> spec = Specification.where(ProductSpecification.hasName(name))
+			.or(ProductSpecification.hasBrand(brand));
+		List<Product> products = productRepository.findAll(spec);
+
+		return products.stream()
+			.map(ProductDto::toDTO)
 			.toList();
 	}
 
