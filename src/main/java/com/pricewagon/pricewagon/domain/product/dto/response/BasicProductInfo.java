@@ -3,7 +3,7 @@ package com.pricewagon.pricewagon.domain.product.dto.response;
 import java.math.BigDecimal;
 
 import com.pricewagon.pricewagon.domain.product.entity.Product;
-import com.pricewagon.pricewagon.domain.product.entity.type.Shop;
+import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 
 public record BasicProductInfo(
 	Integer productNumber,
@@ -13,7 +13,7 @@ public record BasicProductInfo(
 	Integer reviewCount,
 	Integer likeCount,
 	String imgUrl,
-	Shop shop,
+	ShopType shopType,
 	Integer currentPrice,
 	Integer previousPrice
 
@@ -27,7 +27,7 @@ public record BasicProductInfo(
 			product.getReviewCount(),
 			product.getLikeCount(),
 			product.getImgUrl(),
-			product.getShop(),
+			product.getShopType(),
 			product.getCurrentPrice(),
 			previousPrice
 		);
