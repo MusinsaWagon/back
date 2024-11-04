@@ -22,6 +22,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import jakarta.persistence.*;
+import lombok.*;
+import java.time.LocalDate;
+import java.util.Date;
+
+
 @Entity
 @Getter
 @Builder
@@ -41,17 +47,17 @@ public class Alarm extends CreatedDateEntity {
 	@JoinColumn(name = "product_id", nullable = false)
 	private Product product;
 
-	@Column(nullable = false)
+	@Column(nullable= false)
 	private Integer desired_price;
 
-	@Column(nullable = false)
+	@Column(nullable= false)
 	private LocalDate start_date;
 
-	@Column(nullable = false)
+	@Column(nullable= false)
 	private LocalDate end_date;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
+	@Column(nullable= false)
 	private AlarmStatus status;
 
 	@Column(nullable = false)
@@ -59,5 +65,4 @@ public class Alarm extends CreatedDateEntity {
 
 	@Column(nullable = false)
 	private String content;
-
 }
