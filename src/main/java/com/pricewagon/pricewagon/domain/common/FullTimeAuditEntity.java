@@ -2,7 +2,6 @@ package com.pricewagon.pricewagon.domain.common;
 
 import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -12,16 +11,10 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 
 @EntityListeners(AuditingEntityListener.class)
-@MappedSuperclass
 @Getter
-public class UserAuditEntity {
-
-	@CreatedDate
-	@Column(name = "created_at", nullable = false, updatable = false)
-	private LocalDateTime createdAt;
-
+@MappedSuperclass
+public class FullTimeAuditEntity extends CreatedTimeEntity {
 	@LastModifiedDate
 	@Column(name = "updated_at", nullable = false)
 	private LocalDateTime updatedAt;
-
 }

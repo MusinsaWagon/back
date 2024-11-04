@@ -6,7 +6,7 @@ import java.util.List;
 import org.hibernate.annotations.Comment;
 
 import com.pricewagon.pricewagon.domain.alarm.entity.Alarm;
-import com.pricewagon.pricewagon.domain.common.UserAuditEntity;
+import com.pricewagon.pricewagon.domain.common.FullTimeAuditEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends UserAuditEntity {
+public class User extends FullTimeAuditEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;

@@ -13,7 +13,7 @@ import lombok.Getter;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @MappedSuperclass
-public class BaseAuditEntity extends BaseEntity {
+public class FullDateAuditEntity extends CreatedDateEntity {
 	@LastModifiedDate
 	@Column(name = "updated_at", nullable = false)
 	private LocalDate updatedAt;

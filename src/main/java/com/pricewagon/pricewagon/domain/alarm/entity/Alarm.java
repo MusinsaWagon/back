@@ -1,21 +1,39 @@
 package com.pricewagon.pricewagon.domain.alarm.entity;
 
-import com.pricewagon.pricewagon.domain.common.BaseEntity;
+import java.time.LocalDate;
+
+import com.pricewagon.pricewagon.domain.common.CreatedDateEntity;
 import com.pricewagon.pricewagon.domain.product.entity.Product;
 import com.pricewagon.pricewagon.domain.user.entity.User;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDate;
 import java.util.Date;
+
 
 @Entity
 @Getter
 @Builder
-@NoArgsConstructor(access= AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Alarm extends BaseEntity {
+public class Alarm extends CreatedDateEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,6 +65,4 @@ public class Alarm extends BaseEntity {
 
 	@Column(nullable = false)
 	private String content;
-
-
 }
