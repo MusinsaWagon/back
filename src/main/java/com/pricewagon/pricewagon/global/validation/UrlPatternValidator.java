@@ -1,7 +1,7 @@
 package com.pricewagon.pricewagon.global.validation;
 
 import com.pricewagon.pricewagon.domain.product.dto.request.ProductUrlRequest;
-import com.pricewagon.pricewagon.domain.product.entity.type.Shop;
+import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -9,15 +9,15 @@ import jakarta.validation.ConstraintValidatorContext;
 public class UrlPatternValidator implements ConstraintValidator<ValidUrlPattern, ProductUrlRequest> {
 	@Override
 	public boolean isValid(ProductUrlRequest value, ConstraintValidatorContext context) {
-		if (value == null || value.url() == null || value.shop() == null) {
+		if (value == null || value.url() == null || value.shopType() == null) {
 			return false;
 		}
 		String url = value.url();
-		Shop shop = value.shop();
+		ShopType shopType = value.shopType();
 		String regex = "";
 
 		// 쇼핑몰별 URL 패턴 설정 (숫자 6~10자리)
-		switch (shop) {
+		switch (shopType) {
 			case MUSINSA:
 				regex = "^https://www\\.musinsa\\.com/products/\\d{6,10}$";
 				break;

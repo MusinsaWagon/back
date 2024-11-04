@@ -14,7 +14,7 @@ import com.pricewagon.pricewagon.domain.category.entity.Category;
 import com.pricewagon.pricewagon.domain.category.repository.CategoryRepository;
 import com.pricewagon.pricewagon.domain.product.entity.Product;
 import com.pricewagon.pricewagon.domain.product.entity.ProductDetail;
-import com.pricewagon.pricewagon.domain.product.entity.type.Shop;
+import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 import com.pricewagon.pricewagon.domain.product.repository.ProductDetailRepository;
 import com.pricewagon.pricewagon.domain.product.repository.ProductRepository;
 
@@ -36,7 +36,7 @@ public class ProductDataLoader implements CommandLineRunner {
 		List<Product> products = new ArrayList<>();
 		String[] brands = {"Nike", "Adidas", "Puma", "Uniqlo", "Gucci"};
 		String[] productNames = {"T-shirt", "Shoes", "Hat", "Jacket", "Bag"};
-		Shop[] shops = Shop.values();
+		ShopType[] shopTypes = ShopType.values();
 
 		Random random = new Random();
 		Category category = categoryRepository.findById(1).orElse(null);
@@ -60,7 +60,7 @@ public class ProductDataLoader implements CommandLineRunner {
 				.starScore(BigDecimal.valueOf(3.0 + (5.0 - 3.0) * random.nextDouble()))
 				.reviewCount(10 + random.nextInt(500))
 				.likeCount(50 + random.nextInt(500))
-				.shop(shops[0])
+				.shopType(shopTypes[0])
 				.imgUrl("https://dummyimage.com/200x200/000/fff&text=Product" + (i + 1))
 				.category(category)
 				.productDetail(productDetail)

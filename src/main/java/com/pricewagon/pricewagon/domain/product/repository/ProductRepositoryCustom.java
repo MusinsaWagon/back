@@ -3,8 +3,8 @@ package com.pricewagon.pricewagon.domain.product.repository;
 import java.util.List;
 
 import com.pricewagon.pricewagon.domain.product.entity.Product;
-import com.pricewagon.pricewagon.domain.product.entity.type.Shop;
+import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 
 public interface ProductRepositoryCustom {
-	List<Product> findProductsByShopAndLastId(Shop shop, Integer lastId, int size);
+	List<Product> findProductsByShopTypeAndLastId(ShopType shopType, Integer lastId, int size);
 }

@@ -4,7 +4,7 @@ import org.hibernate.annotations.Comment;
 
 import com.pricewagon.pricewagon.domain.common.CreatedTimeEntity;
 import com.pricewagon.pricewagon.domain.product.dto.request.ProductUrlRequest;
-import com.pricewagon.pricewagon.domain.product.entity.type.Shop;
+import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 import com.pricewagon.pricewagon.domain.product.entity.type.Status;
 
 import jakarta.persistence.Column;
@@ -30,7 +30,7 @@ public class ProductRegistration extends CreatedTimeEntity {
 	@Comment("쇼핑몰 타입")
 	@Enumerated(EnumType.STRING)
 	@Column(length = 50, nullable = false)
-	private Shop shop;
+	private ShopType shopType;
 
 	@Comment("등록 상품 URL")
 	@Column(nullable = false, length = 200)
@@ -43,10 +43,10 @@ public class ProductRegistration extends CreatedTimeEntity {
 
 	@Builder(access = AccessLevel.PRIVATE)
 	private ProductRegistration(
-		Shop shop,
+		ShopType shopType,
 		String url
 	) {
-		this.shop = shop;
+		this.shopType = shopType;
 		this.url = url;
 		this.status = Status.PENDING;
 	}
@@ -55,7 +55,7 @@ public class ProductRegistration extends CreatedTimeEntity {
 		ProductUrlRequest request
 	) {
 		return ProductRegistration.builder()
-			.shop(request.shop())
+			.shopType(request.shopType())
 			.url(request.url())
 			.build();
 	}
