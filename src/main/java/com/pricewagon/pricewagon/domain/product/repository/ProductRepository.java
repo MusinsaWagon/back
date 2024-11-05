@@ -8,14 +8,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.pricewagon.pricewagon.domain.product.entity.Product;
-import com.pricewagon.pricewagon.domain.product.entity.type.Shop;
+import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 
 public interface ProductRepository extends JpaRepository<Product, Integer>, ProductRepositoryCustom {
-	Page<Product> findAllByShop(Shop shop, Pageable pageable);
+	Page<Product> findAllByShopType(ShopType shopType, Pageable pageable);
 
-	Optional<Product> findByShopAndProductNumber(Shop shop, Integer productNumber);
+	Optional<Product> findByShopTypeAndProductNumber(ShopType shopType, Integer productNumber);
 
-	Page<Product> findByShopAndCategory_IdIn(Shop shop, List<Integer> categoryIds, Pageable pageable);
+	Page<Product> findByShopTypeAndCategory_IdIn(ShopType shopType, List<Integer> categoryIds, Pageable pageable);
 
 	boolean existsByProductNumber(Integer productNumber);
 

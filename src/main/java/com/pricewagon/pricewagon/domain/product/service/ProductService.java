@@ -15,7 +15,7 @@ import com.pricewagon.pricewagon.domain.history.service.ProductHistoryService;
 import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo;
 import com.pricewagon.pricewagon.domain.product.entity.Product;
-import com.pricewagon.pricewagon.domain.product.entity.type.Shop;
+import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 import com.pricewagon.pricewagon.domain.product.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -31,8 +31,8 @@ public class ProductService {
 
 	// 쇼핑몰에 따른 상품 리스트 조회
 	@Transactional(readOnly = true)
-	public List<BasicProductInfo> getProductsByShopType(Shop shop, Integer lastId, int size) {
-		List<Product> products = productRepository.findProductsByShopAndLastId(shop, lastId, size);
+	public List<BasicProductInfo> getProductsByShopType(ShopType shopType, Integer lastId, int size) {
+		List<Product> products = productRepository.findProductsByShopTypeAndLastId(shopType, lastId, size);
 
 		return products.stream()
 			.map(product -> {
@@ -44,8 +44,8 @@ public class ProductService {
 
 	// 개별 상품 정보 조회
 	@Transactional(readOnly = true)
-	public ResponseEntity<IndividualProductInfo> getIndividualProductInfo(Shop shop, Integer productNumber) {
-		Product product = productRepository.findByShopAndProductNumber(shop, productNumber)
+	public ResponseEntity<IndividualProductInfo> getIndividualProductInfo(ShopType shopType, Integer productNumber) {
+		Product product = productRepository.findByShopTypeAndProductNumber(shopType, productNumber)
 			.orElseThrow(() -> new RuntimeException("존재하지 않는 상품입니다."));
 
 		Category childCategory = product.getCategory();
@@ -62,7 +62,7 @@ public class ProductService {
 	}
 
 	// 쇼핑몰, 카테고리, 페이지 수로 상품 리스트 조회
-	public List<BasicProductInfo> getBasicProductsByCategory(Shop shop, Pageable pageable,
+	public List<BasicProductInfo> getBasicProductsByCategory(ShopType shopType, Pageable pageable,
 		Integer parentCategoryId) {
 
 		// 상위 카테고리
@@ -77,7 +77,7 @@ public class ProductService {
 			categoriesId.add(category.getId());
 		}
 
-		return productRepository.findByShopAndCategory_IdIn(shop, categoriesId, pageable)
+		return productRepository.findByShopTypeAndCategory_IdIn(shopType, categoriesId, pageable)
 			.stream()
 			.map(product -> {
 				Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);

@@ -10,7 +10,7 @@ import com.pricewagon.pricewagon.domain.alarm.entity.Alarm;
 import com.pricewagon.pricewagon.domain.category.entity.Category;
 import com.pricewagon.pricewagon.domain.common.FullDateAuditEntity;
 import com.pricewagon.pricewagon.domain.history.entity.ProductHistory;
-import com.pricewagon.pricewagon.domain.product.entity.type.Shop;
+import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -74,7 +74,7 @@ public class Product extends FullDateAuditEntity {
 	@Comment("쇼핑몰 타입")
 	@Enumerated(EnumType.STRING)
 	@Column(length = 50, nullable = false)
-	private Shop shop;
+	private ShopType shopType;
 
 	@Comment("카테고리")
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -93,7 +93,7 @@ public class Product extends FullDateAuditEntity {
 
 	@Builder
 	public Product(String imgUrl, String name, Integer productNumber, String brand, Integer currentPrice,
-		BigDecimal starScore, Integer reviewCount, Integer likeCount, Shop shop,
+		BigDecimal starScore, Integer reviewCount, Integer likeCount, ShopType shopType,
 		Category category, ProductDetail productDetail) {
 		this.imgUrl = imgUrl;
 		this.name = name;
@@ -103,7 +103,7 @@ public class Product extends FullDateAuditEntity {
 		this.starScore = starScore;
 		this.reviewCount = reviewCount;
 		this.likeCount = likeCount;
-		this.shop = shop;
+		this.shopType = shopType;
 		this.category = category;
 		this.productDetail = productDetail;
 	}
