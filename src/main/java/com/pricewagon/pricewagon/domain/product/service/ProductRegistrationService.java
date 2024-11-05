@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.pricewagon.pricewagon.domain.product.dto.request.ProductUrlRequest;
 import com.pricewagon.pricewagon.domain.product.entity.ProductRegistration;
-import com.pricewagon.pricewagon.domain.product.entity.type.Shop;
+import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 import com.pricewagon.pricewagon.domain.product.repository.ProductRegistrationRepository;
 import com.pricewagon.pricewagon.domain.product.repository.ProductRepository;
 import com.pricewagon.pricewagon.global.common.constatns.ShopUrlConstants;
@@ -22,7 +22,7 @@ public class ProductRegistrationService {
 
 	// 상품 URL 등록
 	public void registerProductURL(ProductUrlRequest request) {
-		Integer productNumber = extractProductNumber(request.url(), request.shop());
+		Integer productNumber = extractProductNumber(request.url(), request.shopType());
 
 		if (productRepository.existsByProductNumber(productNumber)) {
 			throw new RuntimeException("이미 등록 된 상품입니다.");
@@ -33,8 +33,8 @@ public class ProductRegistrationService {
 	}
 
 	// 상품 url에서 상품번호 추출
-	private Integer extractProductNumber(String url, Shop shop) {
-		String baseUrl = getBaseUrl(shop);
+	private Integer extractProductNumber(String url, ShopType shopType) {
+		String baseUrl = getBaseUrl(shopType);
 		return extractNumberFromUrl(url, baseUrl);
 	}
 
@@ -45,8 +45,8 @@ public class ProductRegistrationService {
 	}
 
 	// shop 타입에 따른 기본 URL
-	private String getBaseUrl(Shop shop) {
-		return ShopUrlConstants.valueOf(shop.name()).getValue();
+	private String getBaseUrl(ShopType shopType) {
+		return ShopUrlConstants.valueOf(shopType.name()).getValue();
 	}
 
 }
