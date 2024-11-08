@@ -11,12 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.pricewagon.pricewagon.domain.category.dto.response.ParentAndChildCategoryDTO;
 import com.pricewagon.pricewagon.domain.category.entity.Category;
 import com.pricewagon.pricewagon.domain.category.service.CategoryService;
-import com.pricewagon.pricewagon.domain.product.dto.request.ProductUrlRequest;
+import com.pricewagon.pricewagon.domain.history.service.ProductHistoryService;
 import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo;
 import com.pricewagon.pricewagon.domain.product.entity.Product;
-import com.pricewagon.pricewagon.domain.product.entity.ShopType;
-import com.pricewagon.pricewagon.domain.product.repository.product.ProductRepository;
+import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
+import com.pricewagon.pricewagon.domain.product.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -42,7 +42,6 @@ public class ProductService {
 			.toList();
 	}
 
-
 	// 개별 상품 정보 조회
 	@Transactional(readOnly = true)
 	public ResponseEntity<IndividualProductInfo> getIndividualProductInfo(ShopType shopType, Integer productNumber) {
@@ -56,13 +55,15 @@ public class ProductService {
 		Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
 		BasicProductInfo basicProductInfo = BasicProductInfo.createHistoryOf(product, previousPrice);
 
-		IndividualProductInfo individualProductInfo = IndividualProductInfo.from(product, basicProductInfo, parentAndChildCategoryDTO);
+		IndividualProductInfo individualProductInfo = IndividualProductInfo.from(product, basicProductInfo,
+			parentAndChildCategoryDTO);
 
 		return ResponseEntity.ok(individualProductInfo);
 	}
 
 	// 쇼핑몰, 카테고리, 페이지 수로 상품 리스트 조회
-	public List<BasicProductInfo> getBasicProductsByCategory(ShopType shopType, Pageable pageable, Integer parentCategoryId) {
+	public List<BasicProductInfo> getBasicProductsByCategory(ShopType shopType, Pageable pageable,
+		Integer parentCategoryId) {
 
 		// 상위 카테고리
 		Category parentCategory = categoryService.getCategoryById(parentCategoryId);
@@ -85,8 +86,4 @@ public class ProductService {
 			.toList();
 	}
 
-	public void registerProductURL(ProductUrlRequest request) {
-
-
-	}
 }

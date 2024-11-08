@@ -1,6 +1,6 @@
 package com.pricewagon.pricewagon.domain.product.dto.request;
 
-import com.pricewagon.pricewagon.domain.product.entity.ShopType;
+import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 import com.pricewagon.pricewagon.global.validation.ValidUrlPattern;
 
 import jakarta.validation.constraints.NotNull;
