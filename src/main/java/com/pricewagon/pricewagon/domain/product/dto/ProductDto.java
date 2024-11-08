@@ -3,7 +3,7 @@ package com.pricewagon.pricewagon.domain.product.dto;
 import java.math.BigDecimal;
 
 import com.pricewagon.pricewagon.domain.product.entity.Product;
-import com.pricewagon.pricewagon.domain.product.entity.ShopType;
+import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 
 public record ProductDto(
 	Integer id,

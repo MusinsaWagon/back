@@ -8,7 +8,9 @@ import org.hibernate.annotations.Comment;
 
 import com.pricewagon.pricewagon.domain.alarm.entity.Alarm;
 import com.pricewagon.pricewagon.domain.category.entity.Category;
-import com.pricewagon.pricewagon.domain.common.BaseAuditEntity;
+import com.pricewagon.pricewagon.domain.common.FullDateAuditEntity;
+import com.pricewagon.pricewagon.domain.history.entity.ProductHistory;
+import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -31,7 +33,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Product extends BaseAuditEntity {
+public class Product extends FullDateAuditEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

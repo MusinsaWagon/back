@@ -14,9 +14,9 @@ import com.pricewagon.pricewagon.domain.category.entity.Category;
 import com.pricewagon.pricewagon.domain.category.repository.CategoryRepository;
 import com.pricewagon.pricewagon.domain.product.entity.Product;
 import com.pricewagon.pricewagon.domain.product.entity.ProductDetail;
-import com.pricewagon.pricewagon.domain.product.entity.ShopType;
-import com.pricewagon.pricewagon.domain.product.repository.product.ProductRepository;
-import com.pricewagon.pricewagon.domain.product.repository.productdetail.ProductDetailRepository;
+import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
+import com.pricewagon.pricewagon.domain.product.repository.ProductDetailRepository;
+import com.pricewagon.pricewagon.domain.product.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
 

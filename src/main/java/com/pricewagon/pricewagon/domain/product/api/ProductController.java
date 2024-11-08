@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pricewagon.pricewagon.domain.product.dto.request.ProductUrlRequest;
 import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo;
-import com.pricewagon.pricewagon.domain.product.entity.ShopType;
+import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
+import com.pricewagon.pricewagon.domain.product.service.ProductRegistrationService;
 import com.pricewagon.pricewagon.domain.product.service.ProductService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/products")
 public class ProductController {
 	private final ProductService productService;
+	private final ProductRegistrationService registrationService;
 
 	@Operation(summary = "전체상품 페이지별 조회", description = "쇼핑몰별 모든 상품")
 	@GetMapping("/{shopType}")
@@ -64,6 +66,6 @@ public class ProductController {
 	public void registerProductURL(
 		@Valid @RequestBody ProductUrlRequest request
 	) {
-		productService.registerProductURL(request);
+		registrationService.registerProductURL(request);
 	}
 }
