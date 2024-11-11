@@ -35,8 +35,15 @@ public class UserCommandServiceImpl implements UserCommandService {
 	}
 
 	@Override
-	public void loginUser(UserRequestDTO.loginDto request) {
-		userRepository.findByAccount(request.getAccount());
-		userRepository.findByPassword(request.getPassword());
+	public User loginUser(UserRequestDTO.loginDto request) {
+
+		User user = userRepository.findByAccount(request.getAccount())
+			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+		if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+			throw new CustomException(ErrorCode.INVALID_PASSWORD);
+		}
+
+		return user;
 	}
 }

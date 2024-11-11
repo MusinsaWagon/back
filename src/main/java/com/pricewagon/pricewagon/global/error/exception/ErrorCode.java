@@ -17,8 +17,8 @@ public enum ErrorCode implements ErrorCodeStatus {
 	NOT_FOUND_REQUEST_ADDRESS(HttpStatus.NOT_FOUND, "잘못된 요청 주소입니다."),
 	NOT_FOUND_REQUEST_RESOURCE(HttpStatus.NOT_FOUND, "존재하지 않은 요청 주소입니다."),
 	MEMBER_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "멤버가 이미 존재합니다."),
-
-	;
+	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "멤버를 찾을 수  없습니다."),
+	INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다.");
 	private final HttpStatus httpStatus;
 	private final String message;
 }

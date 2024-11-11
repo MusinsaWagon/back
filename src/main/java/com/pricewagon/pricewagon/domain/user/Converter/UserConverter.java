@@ -23,7 +23,11 @@ public class UserConverter {
 	}
 
 	public static UserResponseDTO.loginResultDTO loginResult(User user) {
-
+		return UserResponseDTO.loginResultDTO.builder()
+			.memberId(user.getId())
+			.account(user.getAccount())
+			.createdAt(user.getCreatedAt())
+			.build();
 	}
 
 }

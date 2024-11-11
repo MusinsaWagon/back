@@ -20,11 +20,11 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "3. [회원로직]", description = "회원 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/vi/Users")
+@RequestMapping("/api/v1/Users")
 public class UserController {
 	private final UserCommandService userCommandService;
 
-	//회원가입 api
+	// 회원가입 API
 	@Operation(summary = "회원 가입", description = "회원 가입 요청을 처리")
 	@PostMapping("/join")
 	public ResponseEntity<UserResponseDTO.JoinResultDTO> join(
@@ -35,19 +35,14 @@ public class UserController {
 		return ResponseEntity.ok(response);
 	}
 
+	// 로그인 API
 	@Operation(summary = "로그인", description = "일반 로그인")
 	@PostMapping("/login")
 	public ResponseEntity<UserResponseDTO.loginResultDTO> login(
-		@Valid @RequestBody UserRequestDTO.loginDto request) {
-		UserResponseDTO.loginResultDTO loginResultDTO = userCommandService.login(request);
-		return ResponseEntity.ok(response);
+		@Valid @RequestBody UserRequestDTO.loginDto request
+	) {
+		User user = userCommandService.loginUser(request);
+		UserResponseDTO.loginResultDTO loginResultDTO = UserConverter.loginResult(user);
+		return ResponseEntity.ok(loginResultDTO);
 	}
-
-	//로그인 api
-	//    @PostMapping("/login")
-	//    public ApiResponse<UserResponseDTO.loginResultDTO> login (@RequestBody @Valid UserRequestDTO. loginDTO request){
-	//        UserResponseDTO.loginResultDTO loginResultDto = userCommandService.login(request);
-	//        return ApiResponse.onSuccess(loginResultDto);
-	//    }
-
 }
