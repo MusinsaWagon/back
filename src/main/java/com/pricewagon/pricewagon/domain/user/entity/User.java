@@ -48,7 +48,7 @@ public class User extends FullTimeAuditEntity {
 	@Enumerated(EnumType.STRING)
 	private UserRole role;
 
-	public void setEncodedPassword(String password) {
+	public void encodedPassword(String password) {
 		this.password = password;
 	}
 

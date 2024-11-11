@@ -6,4 +6,6 @@ import com.pricewagon.pricewagon.domain.user.entity.User;
 public interface UserCommandService {
 	User joinUser(UserRequestDTO.JoinDto request);
 
+	User loginUser(UserRequestDTO.loginDto request);
+
 }
