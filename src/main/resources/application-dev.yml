@@ -1,4 +1,3 @@
-# 프로그램 실행 시 테이블 update
 spring:
   config:
     activate:
@@ -20,7 +19,9 @@ logging:
       springframework:
         security: trace
         web: DEBUG
-      hibernate:
-        orm:
-          jdbc:
-            bind: trace
+    hibernate:
+      orm:
+        jdbc:
+          bind: trace
+
+

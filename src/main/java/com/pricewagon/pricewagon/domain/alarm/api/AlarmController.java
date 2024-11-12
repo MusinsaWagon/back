@@ -16,4 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class AlarmController {
     private final AlarmService alarmService;
 
+
+//    @GetMapping(value = "/connect", produces = MediaType.TEXT_EVENT_STREAM_VALUE )
+//
+
 }
