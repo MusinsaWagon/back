@@ -1,6 +1,7 @@
 package com.pricewagon.pricewagon.domain.category.service;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,13 +19,14 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class CategoryService {
 	private final CategoryRepository categoryRepository;
+
 	public Category getCategoryById(Integer categoryId) {
 		return categoryRepository.findById(categoryId)
 			.orElseThrow(() -> new RuntimeException("해당 ID의 카테고리가 없습니다"));
 	}
 
-	// 부모id로 부모와 하위 카테고리 모두 리턴
-	public AllCategoryResponse getParentAndSubCategoriesByParentId(Integer parentCategoryId){
+	// 부모 카테고리로 부모와 하위 카테고리 모두 리턴
+	public AllCategoryResponse getParentAndSubCategoriesByParentId(Integer parentCategoryId) {
 		Category parentCategory = getCategoryById(parentCategoryId);
 
 		List<Category> categories = getSubCategoriesByParentId(parentCategoryId);
@@ -41,7 +43,7 @@ public class CategoryService {
 	}
 
 	// 자식 ID로 부모, 자식 카테고리 리턴
-	public ParentAndChildCategoryDTO getParentAndChildCategoriesByChildId(Integer childCategoryId) {
+	public ParentAndChildCategoryDTO getParentAndChildCategoryByChildId(Integer childCategoryId) {
 		Category childCategory = getCategoryById(childCategoryId);
 		Category parentCategory = childCategory.getParentCategory();
 
@@ -49,5 +51,16 @@ public class CategoryService {
 			throw new RuntimeException("해당 카테고리에는 부모 카테고리가 없습니다.");
 		}
 		return ParentAndChildCategoryDTO.from(parentCategory, childCategory);
+	}
+
+	// 부모 카테고리 id를 포함한 자식 카테고리 id의 리스트 반환
+	public List<Integer> getAllCategoryIds(Integer parentCategoryId) {
+		List<Category> childCategories = getSubCategoriesByParentId(parentCategoryId);
+
+		// 부모 카테고리 ID와 자식 카테고리 ID를 하나의 리스트로 합침
+		return Stream.concat(
+			Stream.of(parentCategoryId),
+			childCategories.stream().map(Category::getId)
+		).toList();
 	}
 }
