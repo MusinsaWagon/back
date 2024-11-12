@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 public class User extends FullTimeAuditEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Long id;
 
 	@Comment("아이디")
 	@Column(columnDefinition = "varchar(20)", nullable = false, unique = true)
