@@ -11,29 +11,46 @@ import com.pricewagon.pricewagon.domain.common.FullTimeAuditEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+
 public class User extends FullTimeAuditEntity {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Long id;
 
 	@Comment("아이디")
-	@Column(columnDefinition = "varchar(20)", nullable = false, unique = true)
+	@Column(columnDefinition = "varchar(255)", nullable = false, unique = true)
 	private String account;
 
 	@Comment("비밀번호")
-	@Column(columnDefinition = "varchar(20)", nullable = false)
+	@Column(columnDefinition = "varchar(255)", nullable = false)
 	private String password;
+
+	@Enumerated(EnumType.STRING)
+	private UserRole role;
+
+	public void encodedPassword(String password) {
+		this.password = password;
+	}
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Alarm> alarms = new ArrayList<>();
