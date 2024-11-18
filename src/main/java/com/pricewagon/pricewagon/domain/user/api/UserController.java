@@ -41,8 +41,7 @@ public class UserController {
 	public ResponseEntity<UserResponseDTO.loginResultDTO> login(
 		@Valid @RequestBody UserRequestDTO.loginDto request
 	) {
-		User user = userCommandService.loginUser(request);
-		UserResponseDTO.loginResultDTO loginResultDTO = UserConverter.loginResult(user);
+		UserResponseDTO.loginResultDTO loginResultDTO = userCommandService.loginUser(request);
 		return ResponseEntity.ok(loginResultDTO);
 	}
 }

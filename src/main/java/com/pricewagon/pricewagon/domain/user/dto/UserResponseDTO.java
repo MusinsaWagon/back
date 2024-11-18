@@ -25,6 +25,7 @@ public class UserResponseDTO {
 	public static class loginResultDTO {
 		Long memberId;
 		String account;
+		String accessToken;
 		LocalDateTime createdAt;
 	}
 
