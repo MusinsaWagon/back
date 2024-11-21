@@ -4,5 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.pricewagon.pricewagon.domain.product.entity.ProductRegistration;
 
-public interface ProductRegistrationRepository extends JpaRepository<ProductRegistration, Integer> {
+public interface ProductRegistrationRepository extends JpaRepository<ProductRegistration, Long> {
 }

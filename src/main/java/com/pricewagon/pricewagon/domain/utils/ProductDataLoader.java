@@ -39,7 +39,7 @@ public class ProductDataLoader implements CommandLineRunner {
 		ShopType[] shopTypes = ShopType.values();
 
 		Random random = new Random();
-		Category category = categoryRepository.findById(1).orElse(null);
+		Category category = categoryRepository.findById(1L).orElse(null);
 
 		for (int i = 10000; i < 150000; i++) {
 
