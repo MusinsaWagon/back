@@ -4,8 +4,8 @@ spring:
   profiles:
     active: dev
     group:
-      dev: "dev, datasource"
-      prod: "prod, datasource"
+      dev: "dev"
+      prod: "prod"
 
 server:
   port: 8080

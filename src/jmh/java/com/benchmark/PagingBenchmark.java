@@ -1,17 +1,30 @@
 package com.benchmark;
 
-import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
-import com.pricewagon.pricewagon.domain.product.entity.ShopType;
-import com.pricewagon.pricewagon.domain.product.service.ProductService;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Measurement;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
+import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+
+import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
+import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
+import com.pricewagon.pricewagon.domain.product.service.ProductService;
+
 import jakarta.persistence.EntityManager;
 
 @BenchmarkMode(Mode.AverageTime) // 평균 시간 측정 모드
