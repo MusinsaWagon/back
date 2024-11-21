@@ -5,5 +5,5 @@ import java.util.Optional;
 import com.pricewagon.pricewagon.domain.history.entity.ProductHistory;
 
 public interface ProductHistoryCustomRepository {
-	Optional<ProductHistory> findFirstByProductIdAndPriceNot(Integer productId, Integer currentPrice);
+	Optional<ProductHistory> findFirstByProductIdAndPriceNot(Long productId, Integer currentPrice);
 }

@@ -4,5 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.pricewagon.pricewagon.domain.product.entity.ProductDetail;
 
-public interface ProductDetailRepository extends JpaRepository<ProductDetail, Integer> {
+public interface ProductDetailRepository extends JpaRepository<ProductDetail, Long> {
 }
