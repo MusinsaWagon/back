@@ -1,4 +1,3 @@
-# 프로그램 실행 시 테이블 update
 spring:
   config:
     activate:
@@ -8,10 +7,22 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
         jdbc:
-          time_zone : Asia/Seoul
+          time_zone: Asia/Seoul
         format_sql: true
-    show-sql: true
+      show-sql: true
+
+  datasource:
+    url: jdbc:mysql://${LOCAL_MYSQL_HOST}:${LOCAL_MYSQL_PORT}/${LOCAL_DB_NAME}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maxLifetime: 580000
+      maximum-pool-size: 20
+      idle-timeout: 30000
+      connection-timeout: 30000
+    username: ${LOCAL_MYSQL_USERNAME}
+    password: ${LOCAL_MYSQL_PASSWORD}
 
 # 로깅 설정
 logging:
@@ -20,7 +31,9 @@ logging:
       springframework:
         security: trace
         web: DEBUG
-      hibernate:
-        orm:
-          jdbc:
-            bind: trace
+    hibernate:
+      orm:
+        jdbc:
+          bind: trace
+
+
