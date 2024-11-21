@@ -20,13 +20,13 @@ import lombok.RequiredArgsConstructor;
 public class CategoryService {
 	private final CategoryRepository categoryRepository;
 
-	public Category getCategoryById(Integer categoryId) {
+	public Category getCategoryById(Long categoryId) {
 		return categoryRepository.findById(categoryId)
 			.orElseThrow(() -> new RuntimeException("해당 ID의 카테고리가 없습니다"));
 	}
 
 	// 부모 카테고리로 부모와 하위 카테고리 모두 리턴
-	public AllCategoryResponse getParentAndSubCategoriesByParentId(Integer parentCategoryId) {
+	public AllCategoryResponse getParentAndSubCategoriesByParentId(Long parentCategoryId) {
 		Category parentCategory = getCategoryById(parentCategoryId);
 
 		List<Category> categories = getSubCategoriesByParentId(parentCategoryId);
@@ -38,12 +38,12 @@ public class CategoryService {
 	}
 
 	//부모 ID로 하위 카테고리 찾기
-	public List<Category> getSubCategoriesByParentId(Integer parentCategoryId) {
+	public List<Category> getSubCategoriesByParentId(Long parentCategoryId) {
 		return categoryRepository.findAllByParentCategory_Id(parentCategoryId);
 	}
 
 	// 자식 ID로 부모, 자식 카테고리 리턴
-	public ParentAndChildCategoryDTO getParentAndChildCategoryByChildId(Integer childCategoryId) {
+	public ParentAndChildCategoryDTO getParentAndChildCategoryByChildId(Long childCategoryId) {
 		Category childCategory = getCategoryById(childCategoryId);
 		Category parentCategory = childCategory.getParentCategory();
 
@@ -54,7 +54,7 @@ public class CategoryService {
 	}
 
 	// 부모 카테고리 id를 포함한 자식 카테고리 id의 리스트 반환
-	public List<Integer> getAllCategoryIds(Integer parentCategoryId) {
+	public List<Long> getAllCategoryIds(Long parentCategoryId) {
 		List<Category> childCategories = getSubCategoriesByParentId(parentCategoryId);
 
 		// 부모 카테고리 ID와 자식 카테고리 ID를 하나의 리스트로 합침

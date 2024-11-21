@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 public class ProductRegistration extends CreatedTimeEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Long id;
 
 	@Comment("쇼핑몰 타입")
 	@Enumerated(EnumType.STRING)

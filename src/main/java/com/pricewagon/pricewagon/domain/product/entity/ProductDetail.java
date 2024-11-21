@@ -19,7 +19,7 @@ public class ProductDetail {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Long id;
 
 	@Comment("최고가")
 	@Column(nullable = false)
