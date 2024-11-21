@@ -8,7 +8,7 @@ import com.pricewagon.pricewagon.domain.product.entity.ProductRegistration;
 import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 import com.pricewagon.pricewagon.domain.product.repository.ProductRegistrationRepository;
 import com.pricewagon.pricewagon.domain.product.repository.ProductRepository;
-import com.pricewagon.pricewagon.global.common.constatns.ShopUrlConstants;
+import com.pricewagon.pricewagon.global.common.constatns.ShopUrl;
 
 import lombok.RequiredArgsConstructor;
 
@@ -46,7 +46,7 @@ public class ProductRegistrationService {
 
 	// shop 타입에 따른 기본 URL
 	private String getBaseUrl(ShopType shopType) {
-		return ShopUrlConstants.valueOf(shopType.name()).getValue();
+		return ShopUrl.valueOf(shopType.name()).getValue();
 	}
 
 }
