@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pricewagon.pricewagon.domain.product.dto.ProductDto;
 import com.pricewagon.pricewagon.domain.product.dto.request.ProductUrlRequest;
 import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo;
@@ -66,5 +67,12 @@ public class ProductController {
 		@Valid @RequestBody ProductUrlRequest request
 	) {
 		registrationService.registerProductURL(request);
+	}
+
+	@GetMapping("/search")
+	public ResponseEntity<List<ProductDto>> searchProducts(
+		@RequestParam(required = false) String name,
+		@RequestParam(required = false) String brand) {
+		return ResponseEntity.ok(productService.searchProducts(name, brand));
 	}
 }
