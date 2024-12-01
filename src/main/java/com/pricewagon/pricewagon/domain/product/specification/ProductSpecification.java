@@ -11,12 +11,20 @@ public final class ProductSpecification {
 	}
 
 	public static Specification<Product> hasName(String name) {
-		return (root, query, builder) ->
-			name == null ? null : builder.like(builder.lower(root.get("name")), "%" + name.toLowerCase() + "%");
+		return (root, query, builder) -> {
+			if (name == null || name.isBlank()) {
+				return builder.disjunction();
+			}
+			return builder.like(builder.lower(root.get("name")), "%" + name.toLowerCase() + "%");
+		};
 	}
 
 	public static Specification<Product> hasBrand(String brand) {
-		return (root, query, builder) ->
-			brand == null ? null : builder.like(builder.lower(root.get("brand")), "%" + brand.toLowerCase() + "%");
+		return (root, query, builder) -> {
+			if (brand == null || brand.isBlank()) {
+				return builder.disjunction();
+			}
+			return builder.like(builder.lower(root.get("brand")), "%" + brand.toLowerCase() + "%");
+		};
 	}
 }
