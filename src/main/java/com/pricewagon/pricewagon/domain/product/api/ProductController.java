@@ -70,6 +70,7 @@ public class ProductController {
 		registrationService.registerProductURL(request);
 	}
 
+	@Operation(summary = "상품 브랜드 검색", description = "상품명, 브랜드 동시 검색")
 	@GetMapping("/search")
 	public ResponseEntity<List<ProductDto>> searchProducts(
 		@RequestParam(required = false) String name,
