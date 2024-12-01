@@ -35,16 +35,16 @@ dependencies {
 
     // QueryDSL
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation 'org.springframework.security:spring-security-test'
     annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
     annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
     annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
 
-    implementation 'javax.annotation:javax.annotation-api:1.3.2'
-
-    // JMH dependencies - 최신 버전으로 업데이트
-    jmh 'org.openjdk.jmh:jmh-core:1.35'
-    jmh 'org.openjdk.jmh:jmh-generator-annprocess:1.35'
-    jmh 'org.openjdk.jmh:jmh-generator-bytecode:1.35'
+    // JMH dependencies
+    jmh 'org.openjdk.jmh:jmh-core:1.37'
+    jmh 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
+    jmh 'org.openjdk.jmh:jmh-generator-bytecode:1.37'
 
     // Lombok
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
@@ -60,7 +60,6 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
@@ -81,6 +80,7 @@ checkstyle {
     configFile = file("config/checkstyle/naver-checkstyle-rules.xml")
     configProperties = ["suppressionFile": "config/checkstyle/naver-checkstyle-suppression.xml"]
 }
+
 bootJar {
     archiveFileName = 'pricewagon-blue-green-app.jar'
 }

@@ -3,7 +3,6 @@ package com.pricewagon.pricewagon.domain.product.api;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,18 +44,18 @@ public class ProductController {
 
 	@Operation(summary = "개별 상품 정보 조최", description = "특정 상품에 대한 정보")
 	@GetMapping("/{shopType}/{productNumber}")
-	public ResponseEntity<IndividualProductInfo> getIndividualProductInfo(
+	public IndividualProductInfo getIndividualProductInfo(
 		@PathVariable ShopType shopType,
 		@PathVariable Integer productNumber
 	) {
 		return productService.getIndividualProductInfo(shopType, productNumber);
 	}
 
-	@Operation(summary = "상위 카테고리 상품조회", description = "카테고리에 속한 기본 상품정보")
+	@Operation(summary = "상위 카테고리에 속한 모든 상품조회", description = "카테고리에 속한 기본 상품정보")
 	@GetMapping("/{shopType}/category/{categoryId}")
 	public List<BasicProductInfo> getBasicProductsByCategory(
 		@PathVariable ShopType shopType,
-		@PathVariable Integer categoryId,
+		@PathVariable Long categoryId,
 		Pageable pageable
 	) {
 		return productService.getBasicProductsByCategory(shopType, pageable, categoryId);

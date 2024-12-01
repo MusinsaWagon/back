@@ -6,7 +6,7 @@ import com.pricewagon.pricewagon.domain.product.entity.Product;
 import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 
 public record ProductDto(
-	Integer id,
+	Long id,
 	String imgUrl,
 	String name,
 	Integer productNumber,

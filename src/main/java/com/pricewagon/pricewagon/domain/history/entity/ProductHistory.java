@@ -25,7 +25,7 @@ public class ProductHistory extends CreatedDateEntity {
 	@Id
 	@JsonIgnore
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Long id;
 
 	@Comment("가격")
 	@Column(nullable = false)

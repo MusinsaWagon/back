@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 public class Category {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Long id;
 
 	@Comment("부모 카테고리 ID")
 	@ManyToOne(fetch = FetchType.LAZY)
