@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum ShopUrlConstants {
+public enum ShopUrl {
 	MUSINSA("https://www.musinsa.com/products/"),
 	ABLY("https://m.a-bly.com/goods/"),
 	BRANDI("https://www.brandi.co.kr/products/"),

@@ -19,10 +19,10 @@ import lombok.RequiredArgsConstructor;
 public class CategoryController {
 	private final CategoryService categoryService;
 
-	@Operation(summary = "하위 카테고리 조회", description = "부모와 하위 카테고리 포함 조회")
+	@Operation(summary = "부모 카테고리로 하위 카테고리 조회", description = "부모와 하위 카테고리 포함해 반환")
 	@GetMapping("/{categoryId}")
 	public AllCategoryResponse getParentAndSubCategories(
-		@PathVariable Integer categoryId
+		@PathVariable Long categoryId
 	) {
 		return categoryService.getParentAndSubCategoriesByParentId(categoryId);
 	}

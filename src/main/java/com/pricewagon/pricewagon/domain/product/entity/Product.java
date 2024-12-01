@@ -37,7 +37,7 @@ public class Product extends FullDateAuditEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Long id;
 
 	@Comment("상품 이미지 URL")
 	@Column(length = 200)
