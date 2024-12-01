@@ -64,7 +64,7 @@ public class ProductController {
 
 	@Operation(summary = "상품 등록", description = "크롤링 할 상품 URL 등록")
 	@PostMapping("/registration")
-	public void registerProductURL(
+	public void registerProductUrl(
 		@Valid @RequestBody ProductUrlRequest request
 	) {
 		registrationService.registerProductURL(request);
