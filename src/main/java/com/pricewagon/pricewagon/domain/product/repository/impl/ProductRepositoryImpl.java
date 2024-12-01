@@ -30,6 +30,32 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 			.fetch();
 	}
 
+	@Override
+	public List<Product> findProductsByQueryAndLastId(String name, Integer lastId, int size) {
+		// QueryDSL 필터링 적용
+		BooleanExpression conditions = createSearchCondition(name);
+
+		return jpaQueryFactory
+			.selectFrom(product)
+			.where(
+				gtProductId(lastId),
+				conditions
+			)
+			.orderBy(product.id.asc())
+			.limit(size)
+			.fetch();
+	}
+
+	private BooleanExpression createSearchCondition(String query) {
+		if (query == null || query.isBlank()) {
+			return null;
+		}
+
+		// 검색어를 이름과 브랜드 모두에 적용
+		return product.name.containsIgnoreCase(query)
+			.or(product.brand.containsIgnoreCase(query));
+	}
+
 	private BooleanExpression gtProductId(Integer lastProductId) {
 		return lastProductId == null ? null : product.id.gt(lastProductId);
 	}
