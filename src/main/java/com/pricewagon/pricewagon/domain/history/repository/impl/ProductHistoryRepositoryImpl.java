@@ -18,7 +18,7 @@ public class ProductHistoryRepositoryImpl implements ProductHistoryCustomReposit
 	private final JPAQueryFactory jpaQueryFactory;
 
 	@Override
-	public Optional<ProductHistory> findFirstByProductIdAndPriceNot(Integer productId, Integer currentPrice) {
+	public Optional<ProductHistory> findFirstByProductIdAndPriceNot(Long productId, Integer currentPrice) {
 		ProductHistory result = jpaQueryFactory.selectFrom(productHistory)
 			.where(productHistory.product.id.eq(productId)
 				.and(productHistory.price.ne(currentPrice)))

@@ -62,10 +62,10 @@ public class ProductService {
 
 	// 카테고리, 쇼핑몰, 페이지 수로 상품 리스트 조회
 	public List<BasicProductInfo> getBasicProductsByCategory(ShopType shopType, Pageable pageable,
-		Integer parentCategoryId) {
+		Long parentCategoryId) {
 
 		// 부모, 모든 자식 카테고리 id
-		List<Integer> categoriesId = categoryService.getAllCategoryIds(parentCategoryId);
+		List<Long> categoriesId = categoryService.getAllCategoryIds(parentCategoryId);
 
 		return productRepository.findByShopTypeAndCategory_IdIn(shopType, categoriesId, pageable)
 			.stream()

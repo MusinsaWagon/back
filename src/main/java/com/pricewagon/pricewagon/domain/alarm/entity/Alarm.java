@@ -31,7 +31,7 @@ public class Alarm extends CreatedDateEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
@@ -45,7 +45,7 @@ public class Alarm extends CreatedDateEntity {
 	private Integer desired_price;
 
 	@Column(nullable = false)
-	private LocalDate start_date;
+	private LocalDate start_dat;
 
 	@Column(nullable = false)
 	private LocalDate end_date;
