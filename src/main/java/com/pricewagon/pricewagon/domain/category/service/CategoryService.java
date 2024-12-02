@@ -63,4 +63,12 @@ public class CategoryService {
 			childCategories.stream().map(Category::getId)
 		).toList();
 	}
+
+	@Transactional(readOnly = true)
+	public List<CategoryDTO> getParentCategories() {
+		return categoryRepository.findParentCategories().stream()
+			.map(CategoryDTO::toDTO)
+			.toList();
+	}
+
 }
