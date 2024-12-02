@@ -36,4 +36,28 @@ public class UserRequestDTO {
 		String password;
 
 	}
+
+	@Getter
+	public static class emailRequestDTO {
+		@NotBlank
+		@Email
+		String account;
+	}
+
+	@Getter
+	public static class checkEmailDTO {
+		@NotBlank
+		@Email
+		String email;
+	}
+
+	@Getter
+	public static class validNumDTO {
+		@Email
+		@NotBlank
+		String email;
+
+		@NotBlank
+		String validCode;
+	}
 }
