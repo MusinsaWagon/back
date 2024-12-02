@@ -21,9 +21,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -44,19 +46,20 @@ public class Alarm extends CreatedDateEntity {
 	@Column(nullable = false)
 	private Integer desired_price;
 
-	@Column(nullable = false)
-	private LocalDate start_dat;
+	@Column
+	private LocalDate start_date;
 
-	@Column(nullable = false)
+	@Column
 	private LocalDate end_date;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private AlarmStatus status;
 
-	@Column(nullable = false)
+	@Column
 	private String url;
 
-	@Column(nullable = false)
+	@Column
 	private String content;
+
 }
