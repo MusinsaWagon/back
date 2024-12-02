@@ -1,8 +1,16 @@
 package com.pricewagon.pricewagon.domain.alarm.repository;
 
-import com.pricewagon.pricewagon.domain.alarm.entity.Alarm;
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-public interface AlarmRepository extends JpaRepository<Alarm, Long> {
+import org.springframework.stereotype.Repository;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+@Repository
+public class AlarmRepository {
+	private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
+
+	public SseEmitter findById(Long userId) {
+		return emitters.get(userId);
+	}
 }

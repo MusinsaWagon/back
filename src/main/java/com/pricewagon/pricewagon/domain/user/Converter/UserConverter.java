@@ -40,4 +40,24 @@ public class UserConverter {
 			.build();
 	}
 
+	public static UserResponseDTO.emailResultDTO toEmailResult(String authCode) {
+		return UserResponseDTO.emailResultDTO.builder()
+			.validCode(Integer.valueOf(authCode)) // 생성된 인증번호
+			.build();
+	}
+
+	public static UserResponseDTO.emailCheckDTO toCheckResult(UserRequestDTO.checkEmailDTO request,
+		boolean isDuplicated) {
+		return UserResponseDTO.emailCheckDTO.builder()
+			.isDuplicated(isDuplicated)
+			.email(request.getEmail())
+			.build();
+	}
+
+	public static UserResponseDTO.validNumDTO toValidCheck(Boolean checked) {
+		return UserResponseDTO.validNumDTO.builder()
+			.isValid(checked)
+			.build();
+	}
+
 }
