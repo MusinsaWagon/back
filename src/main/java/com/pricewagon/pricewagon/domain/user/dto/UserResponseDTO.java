@@ -25,7 +25,34 @@ public class UserResponseDTO {
 	public static class loginResultDTO {
 		Long memberId;
 		String account;
+		String accessToken;
 		LocalDateTime createdAt;
+	}
+
+	@Builder
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class emailResultDTO {
+		Integer validCode;
+
+	}
+
+	@Builder
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class emailCheckDTO {
+		String email;
+		boolean isDuplicated; // 중복 true, false : 중복 아님
+	}
+
+	@Builder
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class validNumDTO {
+		boolean isValid;
 	}
 
 }
