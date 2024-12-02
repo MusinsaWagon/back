@@ -24,7 +24,7 @@ public class CustomUserDetailService implements UserDetailsService {
 		CustomUserInfoDto userInfoDto = CustomUserInfoDto.builder()
 			.userId(user.getId())
 			.password(user.getPassword())
-			.email(user.getAccount())
+			.account(user.getAccount())
 			.role(user.getRole())
 			.build();
 
