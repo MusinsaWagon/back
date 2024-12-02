@@ -9,4 +9,6 @@ public interface UserCommandService {
 
 	UserResponseDTO.loginResultDTO loginUser(UserRequestDTO.loginDto request);
 
+	UserResponseDTO.emailCheckDTO checkEmail(UserRequestDTO.checkEmailDTO request);
+
 }

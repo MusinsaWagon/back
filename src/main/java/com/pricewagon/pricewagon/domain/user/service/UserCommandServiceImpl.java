@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class UserCommandServiceImpl implements UserCommandService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
+
 	private final JwtUtil jwtUtil;
 
 	@Override
@@ -52,4 +53,11 @@ public class UserCommandServiceImpl implements UserCommandService {
 		String accessToken = jwtUtil.createAccessToken(info);
 		return UserConverter.loginResult(user, accessToken);
 	}
+
+	@Override
+	public UserResponseDTO.emailCheckDTO checkEmail(UserRequestDTO.checkEmailDTO request) {
+		boolean isDuplicated = userRepository.existsByAccount(request.getEmail());
+		return UserConverter.toCheckResult(request, isDuplicated);
+	}
+
 }
