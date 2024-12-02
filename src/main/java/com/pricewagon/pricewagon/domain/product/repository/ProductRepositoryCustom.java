@@ -7,4 +7,6 @@ import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 
 public interface ProductRepositoryCustom {
 	List<Product> findProductsByShopTypeAndLastId(ShopType shopType, Integer lastId, int size);
+
+	List<Product> findProductsByQueryAndLastId(String name, Integer lastId, int size);
 }
