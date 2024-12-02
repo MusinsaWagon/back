@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pricewagon.pricewagon.domain.product.dto.request.ProductUrlRequest;
 import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
+import com.pricewagon.pricewagon.domain.product.dto.response.BrandSearchResponse;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo;
+import com.pricewagon.pricewagon.domain.product.dto.response.ProductSearchResponse;
 import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 import com.pricewagon.pricewagon.domain.product.service.ProductRegistrationService;
 import com.pricewagon.pricewagon.domain.product.service.ProductService;
@@ -62,9 +64,26 @@ public class ProductController {
 
 	@Operation(summary = "상품 등록", description = "크롤링 할 상품 URL 등록")
 	@PostMapping("/registration")
-	public void registerProductURL(
+	public void registerProductUrl(
 		@Valid @RequestBody ProductUrlRequest request
 	) {
 		registrationService.registerProductURL(request);
+	}
+
+	@Operation(summary = "브랜드 이름 검색", description = "검색 시 브랜드 이름 검색")
+	@GetMapping("/brands")
+	public BrandSearchResponse searchBrands(
+		@RequestParam(required = true) String name) {
+		return productService.searchBrands(name);
+	}
+
+	@Operation(summary = "상품, 브랜드 검색", description = "상품명, 브랜드 동시 검색")
+	@GetMapping("/search")
+	public ProductSearchResponse searchProducts(
+		@RequestParam(required = true) String name,
+		@RequestParam(required = false) Integer lastId,
+		@RequestParam(defaultValue = "10") int size
+	) {
+		return productService.searchProducts(name, lastId, size);
 	}
 }

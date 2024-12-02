@@ -3,6 +3,7 @@ package com.pricewagon.pricewagon.domain.product.service;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,11 +11,15 @@ import com.pricewagon.pricewagon.domain.category.dto.response.ParentAndChildCate
 import com.pricewagon.pricewagon.domain.category.entity.Category;
 import com.pricewagon.pricewagon.domain.category.service.CategoryService;
 import com.pricewagon.pricewagon.domain.history.service.ProductHistoryService;
+import com.pricewagon.pricewagon.domain.product.dto.ProductDto;
 import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
+import com.pricewagon.pricewagon.domain.product.dto.response.BrandSearchResponse;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo;
+import com.pricewagon.pricewagon.domain.product.dto.response.ProductSearchResponse;
 import com.pricewagon.pricewagon.domain.product.entity.Product;
 import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 import com.pricewagon.pricewagon.domain.product.repository.ProductRepository;
+import com.pricewagon.pricewagon.domain.product.specification.ProductSpecification;
 
 import lombok.RequiredArgsConstructor;
 
@@ -76,4 +81,29 @@ public class ProductService {
 			.toList();
 	}
 
+	@Transactional(readOnly = true)
+	public BrandSearchResponse searchBrands(String brand) {
+		Specification<Product> brandSpec = Specification.where(
+			ProductSpecification.hasBrand(brand)
+		);
+
+		List<String> relatedBrands = productRepository.findAll(brandSpec).stream()
+			.map(Product::getBrand)
+			.distinct()
+			.toList();
+
+		return BrandSearchResponse.of(relatedBrands);
+	}
+
+	@Transactional(readOnly = true)
+	public ProductSearchResponse searchProducts(String name, Integer lastId, int size) {
+		List<Product> products = productRepository.findProductsByQueryAndLastId(name, lastId, size);
+
+		// DTO 변환
+		List<ProductDto> relatedProducts = products.stream()
+			.map(ProductDto::toDTO)
+			.toList();
+
+		return ProductSearchResponse.of(relatedProducts);
+	}
 }
