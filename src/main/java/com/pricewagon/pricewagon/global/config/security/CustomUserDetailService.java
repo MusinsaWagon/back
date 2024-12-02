@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.pricewagon.pricewagon.domain.user.dto.CustomUserInfoDto;
 import com.pricewagon.pricewagon.domain.user.entity.User;
 import com.pricewagon.pricewagon.domain.user.repository.UserRepository;
 
@@ -20,10 +21,14 @@ public class CustomUserDetailService implements UserDetailsService {
 		User user = userRepository.findByAccount(account)
 			.orElseThrow(() -> new UsernameNotFoundException("해당 이메일을 가진 유저가 존재하지 않습니다: " + account));
 
-		return org.springframework.security.core.userdetails.User
-			.withUsername(user.getAccount())
+		CustomUserInfoDto userInfoDto = CustomUserInfoDto.builder()
+			.userId(user.getId())
 			.password(user.getPassword())
-			.roles(user.getRole().name())
+			.email(user.getAccount())
+			.role(user.getRole())
 			.build();
+
+		return new CustomUserDetails(userInfoDto);
+
 	}
 }

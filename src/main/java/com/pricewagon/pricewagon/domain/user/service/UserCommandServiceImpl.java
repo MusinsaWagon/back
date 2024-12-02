@@ -4,9 +4,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.pricewagon.pricewagon.domain.user.Converter.UserConverter;
+import com.pricewagon.pricewagon.domain.user.dto.CustomUserInfoDto;
 import com.pricewagon.pricewagon.domain.user.dto.UserRequestDTO;
+import com.pricewagon.pricewagon.domain.user.dto.UserResponseDTO;
 import com.pricewagon.pricewagon.domain.user.entity.User;
 import com.pricewagon.pricewagon.domain.user.repository.UserRepository;
+import com.pricewagon.pricewagon.global.config.security.JwtUtil;
 import com.pricewagon.pricewagon.global.error.exception.CustomException;
 import com.pricewagon.pricewagon.global.error.exception.ErrorCode;
 
@@ -17,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 public class UserCommandServiceImpl implements UserCommandService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
+
+	private final JwtUtil jwtUtil;
 
 	@Override
 	public User joinUser(UserRequestDTO.JoinDto request) {
@@ -35,7 +40,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 	}
 
 	@Override
-	public User loginUser(UserRequestDTO.loginDto request) {
+	public UserResponseDTO.loginResultDTO loginUser(UserRequestDTO.loginDto request) {
 
 		User user = userRepository.findByAccount(request.getAccount())
 			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
@@ -43,7 +48,16 @@ public class UserCommandServiceImpl implements UserCommandService {
 		if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
 			throw new CustomException(ErrorCode.INVALID_PASSWORD);
 		}
+		CustomUserInfoDto info = UserConverter.toCustomUserInfoDto(user);
 
-		return user;
+		String accessToken = jwtUtil.createAccessToken(info);
+		return UserConverter.loginResult(user, accessToken);
 	}
+
+	@Override
+	public UserResponseDTO.emailCheckDTO checkEmail(UserRequestDTO.checkEmailDTO request) {
+		boolean isDuplicated = userRepository.existsByAccount(request.getEmail());
+		return UserConverter.toCheckResult(request, isDuplicated);
+	}
+
 }
