@@ -39,7 +39,7 @@ public class JwtUtil {
 	private String createToken(CustomUserInfoDto user, long expireTime) {
 		Claims claims = Jwts.claims();
 		claims.put("userId", user.getUserId());
-		claims.put("email", user.getEmail());
+		claims.put("email", user.getAccount());
 		claims.put("role", user.getRole());
 
 		ZonedDateTime now = ZonedDateTime.now();
@@ -86,8 +86,8 @@ public class JwtUtil {
 	}
 
 	// token 에서 userId 추출
-	public Long getUserId(String token) {
-		return parseClaims(token).get("userId", Long.class);
+	public String getUserEmail(String token) {
+		return parseClaims(token).get("email", String.class);
 	}
 
 }

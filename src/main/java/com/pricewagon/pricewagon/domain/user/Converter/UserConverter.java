@@ -35,7 +35,7 @@ public class UserConverter {
 	public static CustomUserInfoDto toCustomUserInfoDto(User user) {
 		return CustomUserInfoDto.builder()
 			.userId(user.getId())
-			.email(user.getAccount())
+			.account(user.getAccount())
 			.role(user.getRole())
 			.build();
 	}

@@ -4,9 +4,8 @@ spring:
   profiles:
     active: dev
     group:
-
-      dev: "dev, datasource"
-      prod: "prod, datasource"
+      dev: "dev"
+      prod: "prod"
   mail:
     host: smtp.gmail.com
     port: 587
@@ -25,8 +24,8 @@ spring:
     auth-code-expiration-millis: 1800000
   data:
     redis:
-      port: ${REDIS_PORT}
       host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 
 server:
   port: 8080
@@ -51,12 +50,6 @@ springdoc:
     syntax-highlight:
       theme: none
     urls-primary-name: MUSINSAWAGON API DOCS
-oauth:
-  kakao:
-    client-id: 3fbb085f93e4a03ef219e0ed5d59c351
-    url:
-      auth: https://kauth.kakao.com
-      api: https://kapi.kakao.com
 jwt:
   expiration_time: 86400000 # 1일
   secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHa
