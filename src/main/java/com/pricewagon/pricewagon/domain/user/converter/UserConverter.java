@@ -1,4 +1,4 @@
-package com.pricewagon.pricewagon.domain.user.Converter;
+package com.pricewagon.pricewagon.domain.user.converter;
 
 import com.pricewagon.pricewagon.domain.user.dto.CustomUserInfoDto;
 import com.pricewagon.pricewagon.domain.user.dto.UserRequestDTO;
@@ -35,7 +35,7 @@ public class UserConverter {
 	public static CustomUserInfoDto toCustomUserInfoDto(User user) {
 		return CustomUserInfoDto.builder()
 			.userId(user.getId())
-			.email(user.getAccount())
+			.account(user.getAccount())
 			.role(user.getRole())
 			.build();
 	}
