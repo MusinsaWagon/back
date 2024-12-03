@@ -3,7 +3,7 @@ package com.pricewagon.pricewagon.domain.user.service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.pricewagon.pricewagon.domain.user.Converter.UserConverter;
+import com.pricewagon.pricewagon.domain.user.converter.UserConverter;
 import com.pricewagon.pricewagon.domain.user.dto.CustomUserInfoDto;
 import com.pricewagon.pricewagon.domain.user.dto.UserRequestDTO;
 import com.pricewagon.pricewagon.domain.user.dto.UserResponseDTO;

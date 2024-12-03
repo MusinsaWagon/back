@@ -1,4 +1,4 @@
-package com.pricewagon.pricewagon.domain.user.Converter;
+package com.pricewagon.pricewagon.domain.user.converter;
 
 import com.pricewagon.pricewagon.domain.user.dto.CustomUserInfoDto;
 import com.pricewagon.pricewagon.domain.user.dto.UserRequestDTO;
