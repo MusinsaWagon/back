@@ -35,8 +35,8 @@ jobs:
         run: |
           touch .env
           echo "$ENV" > .env
-          env:
-            ENV: ${{ secrets.ENV }}
+        env:
+          ENV: ${{ secrets.ENV }}
         shell: bash
 
       - name: Gradle 권한 부여
