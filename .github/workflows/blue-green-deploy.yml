@@ -17,20 +17,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       
-      # 프로젝트 저장소에 업로드하면 안되는 설정 파일들을 만들어줍니다.
-      #      - name: Make application.yml
-      #        run: |
-      #          cd ./src/main/resources
-      #          touch ./application.yml
-      #          touch ./application-prod.yml
-      #
-      #          echo "$APPLICATION" > ./application.yml
-      #          echo "$APPLICATION_PROD" > ./application-prod.yml
-      #        env:
-      #          APPLICATION: ${{ secrets.APPLICATION }}
-      #          APPLICATION_PROD: ${{ secrets.APPLICATION_PROD }}
-      #        shell: bash
-
       - name: ENV 파일 생성
         run: |
           touch .env
