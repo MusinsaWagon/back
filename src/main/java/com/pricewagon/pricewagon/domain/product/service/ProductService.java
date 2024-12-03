@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.pricewagon.pricewagon.domain.alarm.entity.Alarm;
 import com.pricewagon.pricewagon.domain.category.dto.response.ParentAndChildCategoryDTO;
 import com.pricewagon.pricewagon.domain.category.entity.Category;
 import com.pricewagon.pricewagon.domain.category.service.CategoryService;
@@ -105,5 +106,13 @@ public class ProductService {
 			.toList();
 
 		return ProductSearchResponse.of(relatedProducts);
+	}
+
+	public boolean isPriceBelowDesired(Alarm alarm) {
+		// Assuming Product entity has a method to get the current price
+		Integer currentPrice = productRepository.findById(Math.toIntExact(alarm.getProduct().getId()))
+			.orElseThrow(() -> new IllegalArgumentException("Product not found"))
+			.getCurrentPrice();
+		return currentPrice <= alarm.getDesired_price();
 	}
 }

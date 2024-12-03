@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pricewagon.pricewagon.domain.user.Converter.UserConverter;
+import com.pricewagon.pricewagon.domain.user.converter.UserConverter;
 import com.pricewagon.pricewagon.domain.user.dto.UserRequestDTO;
 import com.pricewagon.pricewagon.domain.user.dto.UserResponseDTO;
 import com.pricewagon.pricewagon.domain.user.entity.User;
