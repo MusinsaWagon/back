@@ -25,11 +25,9 @@ jobs:
           touch ./application-prod.yml
           
           echo "$APPLICATION" > ./application.yml
-          echo "$APPLICATION_DATASOURCE" > ./application-datasource.yml
           echo "$APPLICATION_PROD" > ./application-prod.yml
         env:
           APPLICATION: ${{ secrets.APPLICATION }}
-          APPLICATION_DATASOURCE: ${{ secrets.APPLICATION_DATASOURCE }}
           APPLICATION_PROD: ${{ secrets.APPLICATION_PROD }}
         shell: bash
 
