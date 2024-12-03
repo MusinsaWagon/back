@@ -22,7 +22,6 @@ jobs:
         run: |
           cd ./src/main/resources
           touch ./application.yml
-          touch ./application-datasource.yml
           touch ./application-prod.yml
           
           echo "$APPLICATION" > ./application.yml
