@@ -4,6 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.pricewagon.pricewagon.domain.user.dto.CustomUserInfoDto;
 import com.pricewagon.pricewagon.domain.user.dto.KakaoDTO;
+import com.pricewagon.pricewagon.domain.user.dto.NaverDTO;
 import com.pricewagon.pricewagon.domain.user.dto.UserRequestDTO;
 import com.pricewagon.pricewagon.domain.user.dto.UserResponseDTO;
 import com.pricewagon.pricewagon.domain.user.entity.User;
@@ -20,8 +21,16 @@ public class UserConverter {
 
 	public static User toUser(KakaoDTO.KakaoProfile kakaoProfile, PasswordEncoder passwordEncoder) {
 		return User.builder()
-			.account(kakaoProfile.getId().toString())
+			.account(kakaoProfile.getKakao_account().getEmail())
 			.password(passwordEncoder.encode("kakao"))
+			.role(UserRole.USER)
+			.build();
+	}
+
+	public static User toUser(NaverDTO.UserInfo naverProfile, PasswordEncoder passwordEncoder) {
+		return User.builder()
+			.account(naverProfile.getResponse().getEmail())
+			.password(passwordEncoder.encode("naver"))
 			.role(UserRole.USER)
 			.build();
 	}

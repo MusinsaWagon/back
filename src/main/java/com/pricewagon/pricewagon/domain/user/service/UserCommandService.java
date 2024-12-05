@@ -13,6 +13,8 @@ public interface UserCommandService {
 
 	UserResponseDTO.emailCheckDTO checkEmail(UserRequestDTO.checkEmailDTO request);
 
-	UserResponseDTO.loginResultDTO oAuthLogin(String accessCode, HttpServletResponse httpServletResponse);
+	UserResponseDTO.loginResultDTO oAuthKakaoLogin(String accessCode, HttpServletResponse httpServletResponse);
+
+	UserResponseDTO.loginResultDTO oAuthNaverLogin(String accessCode, HttpServletResponse httpServletResponse);
 
 }

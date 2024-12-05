@@ -6,12 +6,14 @@ import org.springframework.stereotype.Service;
 import com.pricewagon.pricewagon.domain.user.converter.UserConverter;
 import com.pricewagon.pricewagon.domain.user.dto.CustomUserInfoDto;
 import com.pricewagon.pricewagon.domain.user.dto.KakaoDTO;
+import com.pricewagon.pricewagon.domain.user.dto.NaverDTO;
 import com.pricewagon.pricewagon.domain.user.dto.UserRequestDTO;
 import com.pricewagon.pricewagon.domain.user.dto.UserResponseDTO;
 import com.pricewagon.pricewagon.domain.user.entity.User;
 import com.pricewagon.pricewagon.domain.user.repository.UserRepository;
 import com.pricewagon.pricewagon.global.config.security.JwtUtil;
 import com.pricewagon.pricewagon.global.config.security.KakaoUtil;
+import com.pricewagon.pricewagon.global.config.security.NaverUtil;
 import com.pricewagon.pricewagon.global.error.exception.CustomException;
 import com.pricewagon.pricewagon.global.error.exception.ErrorCode;
 
@@ -26,6 +28,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 
 	private final JwtUtil jwtUtil;
 	private final KakaoUtil kakaoUtil;
+	private final NaverUtil naverUtil;
 
 	@Override
 	public User joinUser(UserRequestDTO.JoinDto request) {
@@ -65,7 +68,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 	}
 
 	@Override
-	public UserResponseDTO.loginResultDTO oAuthLogin(String accessCode, HttpServletResponse httpServletResponse) {
+	public UserResponseDTO.loginResultDTO oAuthKakaoLogin(String accessCode, HttpServletResponse httpServletResponse) {
 		KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode);
 		KakaoDTO.KakaoProfile kakaoProfile = kakaoUtil.requestProfile(oAuthToken);
 		String email = kakaoProfile.getKakao_account().getEmail();
@@ -76,8 +79,24 @@ public class UserCommandServiceImpl implements UserCommandService {
 
 	}
 
+	@Override
+	public UserResponseDTO.loginResultDTO oAuthNaverLogin(String accessCode, HttpServletResponse httpServletResponse) {
+		NaverDTO.OAuthToken oAuthToken = naverUtil.requestToken(accessCode);
+		NaverDTO.UserInfo userInfo = naverUtil.requestUserInfo(oAuthToken.getAccess_token());
+		String email = userInfo.getResponse().getEmail();
+		User user = userRepository.findByAccount(email)
+			.orElseGet(() -> createNewUser(userInfo));
+		String token = jwtUtil.createAccessToken(UserConverter.toCustomUserInfoDto(user));
+		return UserConverter.loginResult(user, token);
+	}
+
 	private User createNewUser(KakaoDTO.KakaoProfile kakaoProfile) {
 		User newUser = UserConverter.toUser(kakaoProfile, passwordEncoder);
+		return userRepository.save(newUser);
+	}
+
+	private User createNewUser(NaverDTO.UserInfo userInfo) {
+		User newUser = UserConverter.toUser(userInfo, passwordEncoder);
 		return userRepository.save(newUser);
 	}
 

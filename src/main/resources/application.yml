@@ -31,6 +31,7 @@ spring:
       client: ${KAKAO_CLIENT}
       redirect: ${KAKAO_REDIRECT}
 
+
 server:
   port: 8080
   servlet:
@@ -57,3 +58,7 @@ springdoc:
 jwt:
   expiration_time: 86400000 # 1일
   secret: ${JWT_SECRET}
+naver:
+  client_id: ${NAVER_CLIENT_ID}
+  redirect_uri: ${NAVER_REDIRECT_URI}
+  client_secret: ${NAVER_CLIENT_SECRET}
