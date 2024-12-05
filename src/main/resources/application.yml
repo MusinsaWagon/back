@@ -26,6 +26,10 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
+  kakao:
+    auth:
+      client: ${KAKAO_CLIENT}
+      redirect: ${KAKAO_REDIRECT}
 
 server:
   port: 8080
@@ -52,4 +56,4 @@ springdoc:
     urls-primary-name: MUSINSAWAGON API DOCS
 jwt:
   expiration_time: 86400000 # 1일
-  secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHa
+  secret: ${JWT_SECRET}

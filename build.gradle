@@ -73,8 +73,6 @@ dependencies {
     //이메일 인증
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
-    implementation 'io.github.cdimascio:dotenv-java:3.0.0'
-
     //redis 추가
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
