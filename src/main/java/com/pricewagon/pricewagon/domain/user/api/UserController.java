@@ -82,7 +82,16 @@ public class UserController {
 	@GetMapping("/auth/login/kakao")
 	public ResponseEntity<UserResponseDTO.loginResultDTO> kakaoLogin(@RequestParam("code") String accessCode,
 		HttpServletResponse httpServletResponse) {
-		UserResponseDTO.loginResultDTO result = userCommandService.oAuthLogin(accessCode, httpServletResponse);
+		UserResponseDTO.loginResultDTO result = userCommandService.oAuthKakaoLogin(accessCode, httpServletResponse);
+		return ResponseEntity.ok(result);
+	}
+
+	//네이버 소셜 로그인 API
+	@Operation(summary = "네이버 소셜 로그인", description = "네이버 소셜 로그인")
+	@GetMapping("/auth/login/naver")
+	public ResponseEntity<UserResponseDTO.loginResultDTO> naverLogin(@RequestParam("code") String accessCode,
+		HttpServletResponse httpServletResponse) {
+		UserResponseDTO.loginResultDTO result = userCommandService.oAuthNaverLogin(accessCode, httpServletResponse);
 		return ResponseEntity.ok(result);
 	}
 
