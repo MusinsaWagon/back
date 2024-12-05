@@ -109,9 +109,9 @@ public class ProductService {
 	}
 
 	public boolean isPriceBelowDesired(Alarm alarm) {
-		// Assuming Product entity has a method to get the current price
+
 		Integer currentPrice = productRepository.findById(Math.toIntExact(alarm.getProduct().getId()))
-			.orElseThrow(() -> new IllegalArgumentException("Product not found"))
+			.orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."))
 			.getCurrentPrice();
 		return currentPrice <= alarm.getDesired_price();
 	}

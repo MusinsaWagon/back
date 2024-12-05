@@ -51,7 +51,7 @@ public class SecurityConfig {
 
 		// 권한 규칙 설정
 		http.authorizeHttpRequests(authorize -> authorize
-			.requestMatchers("/", "/api/v1/**", "/swagger-ui/**", "/v3/api-docs/**")
+			.requestMatchers("/", "/api/v1/**", "/swagger-ui/**", "/v3/api-docs/**", "/auth/login/**")
 			.permitAll() // 화이트리스트에 등록된 경로는 인증 없이 접근 가능
 			.requestMatchers("/admin/**")
 			.hasRole("ADMIN") // 관리자 권한 제한
