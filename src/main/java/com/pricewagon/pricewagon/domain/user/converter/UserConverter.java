@@ -1,9 +1,13 @@
 package com.pricewagon.pricewagon.domain.user.converter;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import com.pricewagon.pricewagon.domain.user.dto.CustomUserInfoDto;
+import com.pricewagon.pricewagon.domain.user.dto.KakaoDTO;
 import com.pricewagon.pricewagon.domain.user.dto.UserRequestDTO;
 import com.pricewagon.pricewagon.domain.user.dto.UserResponseDTO;
 import com.pricewagon.pricewagon.domain.user.entity.User;
+import com.pricewagon.pricewagon.domain.user.entity.UserRole;
 
 public class UserConverter {
 	public static User toUser(UserRequestDTO.JoinDto request) {
@@ -11,6 +15,14 @@ public class UserConverter {
 			.account(request.getAccount())
 			.password(request.getPassword())
 			.role(request.getRole())
+			.build();
+	}
+
+	public static User toUser(KakaoDTO.KakaoProfile kakaoProfile, PasswordEncoder passwordEncoder) {
+		return User.builder()
+			.account(kakaoProfile.getId().toString())
+			.password(passwordEncoder.encode("kakao"))
+			.role(UserRole.USER)
 			.build();
 	}
 
