@@ -5,14 +5,17 @@ import org.springframework.stereotype.Service;
 
 import com.pricewagon.pricewagon.domain.user.converter.UserConverter;
 import com.pricewagon.pricewagon.domain.user.dto.CustomUserInfoDto;
+import com.pricewagon.pricewagon.domain.user.dto.KakaoDTO;
 import com.pricewagon.pricewagon.domain.user.dto.UserRequestDTO;
 import com.pricewagon.pricewagon.domain.user.dto.UserResponseDTO;
 import com.pricewagon.pricewagon.domain.user.entity.User;
 import com.pricewagon.pricewagon.domain.user.repository.UserRepository;
 import com.pricewagon.pricewagon.global.config.security.JwtUtil;
+import com.pricewagon.pricewagon.global.config.security.KakaoUtil;
 import com.pricewagon.pricewagon.global.error.exception.CustomException;
 import com.pricewagon.pricewagon.global.error.exception.ErrorCode;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -22,6 +25,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 	private final PasswordEncoder passwordEncoder;
 
 	private final JwtUtil jwtUtil;
+	private final KakaoUtil kakaoUtil;
 
 	@Override
 	public User joinUser(UserRequestDTO.JoinDto request) {
@@ -58,6 +62,23 @@ public class UserCommandServiceImpl implements UserCommandService {
 	public UserResponseDTO.emailCheckDTO checkEmail(UserRequestDTO.checkEmailDTO request) {
 		boolean isDuplicated = userRepository.existsByAccount(request.getEmail());
 		return UserConverter.toCheckResult(request, isDuplicated);
+	}
+
+	@Override
+	public UserResponseDTO.loginResultDTO oAuthLogin(String accessCode, HttpServletResponse httpServletResponse) {
+		KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode);
+		KakaoDTO.KakaoProfile kakaoProfile = kakaoUtil.requestProfile(oAuthToken);
+		String email = kakaoProfile.getKakao_account().getEmail();
+		User user = userRepository.findByAccount(email)
+			.orElseGet(() -> createNewUser(kakaoProfile));
+		String token = jwtUtil.createAccessToken(UserConverter.toCustomUserInfoDto(user));
+		return UserConverter.loginResult(user, token);
+
+	}
+
+	private User createNewUser(KakaoDTO.KakaoProfile kakaoProfile) {
+		User newUser = UserConverter.toUser(kakaoProfile, passwordEncoder);
+		return userRepository.save(newUser);
 	}
 
 }
