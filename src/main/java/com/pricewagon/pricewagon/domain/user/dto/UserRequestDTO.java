@@ -28,7 +28,6 @@ public class UserRequestDTO {
 	@Setter
 	public static class loginDto {
 		@NotBlank
-		@Email
 		String account;
 
 		@NotBlank
