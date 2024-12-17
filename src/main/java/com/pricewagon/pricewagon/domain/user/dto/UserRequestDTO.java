@@ -14,7 +14,6 @@ public class UserRequestDTO {
 	@Setter
 	public static class JoinDto {
 		@NotBlank
-		@Email
 		String account;
 
 		@NotBlank
