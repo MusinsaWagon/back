@@ -45,7 +45,6 @@ public class UserRequestDTO {
 	@Getter
 	public static class checkEmailDTO {
 		@NotBlank
-		@Email
 		String email;
 	}
 
