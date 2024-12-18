@@ -13,4 +13,6 @@ public interface AlarmService {
 
 	void registerAlarm(AlarmRequestDTO.registerAlarm request, String email);
 
+	String sendAlarmByToken(AlarmRequestDTO.FCMAlarmRequestDTO request);
+
 }

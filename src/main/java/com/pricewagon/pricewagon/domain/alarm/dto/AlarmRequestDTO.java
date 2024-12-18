@@ -8,4 +8,19 @@ public class AlarmRequestDTO {
 		Integer price;
 		Integer productId;
 	}
+
+	@Getter
+	public static class sendAlarmDTO {
+		String token;
+		String title;
+		String body;
+	}
+
+	@Getter
+	public static class FCMAlarmRequestDTO {
+		Long userId;
+		String title;
+		String body;
+	}
+
 }
