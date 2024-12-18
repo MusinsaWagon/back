@@ -2,12 +2,16 @@ package com.pricewagon.pricewagon.domain.alarm.service.AlarmService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
 import com.pricewagon.pricewagon.domain.alarm.dto.AlarmRequestDTO;
 import com.pricewagon.pricewagon.domain.alarm.entity.Alarm;
 import com.pricewagon.pricewagon.domain.alarm.entity.AlarmStatus;
@@ -33,6 +37,7 @@ public class AlarmServiceImpl implements AlarmService {
 	private final AlarmRepository alarmRepository;
 	private final SseRepository sseRepository;
 	private final ProductRepository productRepository;
+	private final FirebaseMessaging firebaseMessaging;
 
 	@Override
 	public SseEmitter subscribe(String email, String lastEventId) {
@@ -104,6 +109,36 @@ public class AlarmServiceImpl implements AlarmService {
 			.status(AlarmStatus.ACTIVE)
 			.build();
 		alarmRepository.save(alarm);
+	}
+
+	@Override
+	public String sendAlarmByToken(AlarmRequestDTO.FCMAlarmRequestDTO request) {
+		Optional<User> user = userRepository.findById(request.getUserId());
+		if(user.isPresent()){
+			if(user.get().getFirebaseToken() != null){
+				Alarm alarm = Alarm.builder()
+					.user(user.get())
+					.content(request.getBody())
+					.status(AlarmStatus.ACTIVE)
+					.build();
+				Message message = Message.builder()
+					.setToken(user.get().getFirebaseToken())
+					.setNotification(alarm)
+					.build();
+			}
+			try{
+				firebaseMessaging.send(message);
+				return "알림을 성공적으로 전송했습니다. userId: "+request.getUserId();
+			}catch(FirebaseMessagingException e){
+				return "알림 전송에 실패했습니다. userId: "+request.getUserId();
+			}else{
+				return "해당 유저의 토큰이 없습니다. userId: "+request.getUserId();
+			}
+		}else{
+			return "해당 유저가 존재하지 않습니다. userId: "+request.getUserId();
+
+
+		}
 	}
 
 	private Alarm createDummyNotification(String receiver) {

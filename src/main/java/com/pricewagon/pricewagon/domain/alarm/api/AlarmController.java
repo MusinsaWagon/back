@@ -42,4 +42,11 @@ public class AlarmController {
 		alarmService.registerAlarm(request, userDetails.getUsername());
 		return ResponseEntity.ok().build();
 	}
+
+	@Operation(summary = "알람 전송", description = "알람 전송하는 기능")
+	@PostMapping("/send")
+	public ResponseEntity<String> sendAlarm(@RequestBody AlarmRequestDTO.sendAlarmDTO request) {
+		String response = alarmService.sendAlarmTo(request);
+		return ResponseEntity.ok(response);
+	}
 }
