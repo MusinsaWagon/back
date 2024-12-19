@@ -7,6 +7,7 @@ public class AlarmRequestDTO {
 	public static class registerAlarm {
 		Integer price;
 		Integer productId;
+		String fcmToken;
 	}
 
 	@Getter

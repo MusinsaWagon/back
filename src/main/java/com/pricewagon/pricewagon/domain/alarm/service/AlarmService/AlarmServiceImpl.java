@@ -17,6 +17,7 @@ import com.pricewagon.pricewagon.domain.alarm.entity.Alarm;
 import com.pricewagon.pricewagon.domain.alarm.entity.AlarmStatus;
 import com.pricewagon.pricewagon.domain.alarm.repository.AlarmRepository;
 import com.pricewagon.pricewagon.domain.alarm.repository.SseRepository;
+import com.pricewagon.pricewagon.domain.fcm.entity.FcmToken;
 import com.pricewagon.pricewagon.domain.product.entity.Product;
 import com.pricewagon.pricewagon.domain.product.repository.ProductRepository;
 import com.pricewagon.pricewagon.domain.product.service.ProductService;
@@ -39,41 +40,41 @@ public class AlarmServiceImpl implements AlarmService {
 	private final ProductRepository productRepository;
 	private final FirebaseMessaging firebaseMessaging;
 
-	@Override
-	public SseEmitter subscribe(String email, String lastEventId) {
-		String emitterId = email + "_" + System.currentTimeMillis();
-
-		SseEmitter sseEmitter = sseRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
-		log.info("new emitter added : {}", sseEmitter);
-		log.info("lastEventId : {}", lastEventId);
-
-		sseEmitter.onCompletion(() -> sseRepository.deleteEmitterById(emitterId));
-		sseEmitter.onTimeout(() -> sseRepository.deleteEmitterById(emitterId));
-		sseEmitter.onError((e) -> sseRepository.deleteEmitterById(emitterId));
-
-		Alarm dummyNotification = createDummyNotification(email);
-		emitEventToClient(sseEmitter, emitterId, dummyNotification);
-
-		if (!lastEventId.isEmpty()) {
-			Map<String, Object> eventCaches = sseRepository.findAllEventCacheStartsWithUsername(email);
-			eventCaches.entrySet().stream()
-				.filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
-				.forEach(entry -> emitEventToClient(sseEmitter, entry.getKey(), entry.getValue()));
-		}
-
-		return sseEmitter;
-	}
-
-	@Override
-	public void send(String receiver, String content, String type, String url) {
-		Alarm alarm = createNotification(receiver, content, type, url);
-		Map<String, SseEmitter> sseEmitters = sseRepository.findAllEmitterStartsWithUsername(receiver);
-		sseEmitters.forEach((key, sseEmitter) -> {
-			log.info("key, notification : {}, {}", key, alarm);
-			sseRepository.saveEventCache(key, alarm);
-			emitEventToClient(sseEmitter, key, alarm);
-		});
-	}
+	// @Override
+	// public SseEmitter subscribe(String email, String lastEventId) {
+	// 	String emitterId = email + "_" + System.currentTimeMillis();
+	//
+	// 	SseEmitter sseEmitter = sseRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
+	// 	log.info("new emitter added : {}", sseEmitter);
+	// 	log.info("lastEventId : {}", lastEventId);
+	//
+	// 	sseEmitter.onCompletion(() -> sseRepository.deleteEmitterById(emitterId));
+	// 	sseEmitter.onTimeout(() -> sseRepository.deleteEmitterById(emitterId));
+	// 	sseEmitter.onError((e) -> sseRepository.deleteEmitterById(emitterId));
+	//
+	// 	Alarm dummyNotification = createDummyNotification(email);
+	// 	emitEventToClient(sseEmitter, emitterId, dummyNotification);
+	//
+	// 	if (!lastEventId.isEmpty()) {
+	// 		Map<String, Object> eventCaches = sseRepository.findAllEventCacheStartsWithUsername(email);
+	// 		eventCaches.entrySet().stream()
+	// 			.filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
+	// 			.forEach(entry -> emitEventToClient(sseEmitter, entry.getKey(), entry.getValue()));
+	// 	}
+	//
+	// 	return sseEmitter;
+	// }
+	//
+	// @Override
+	// public void send(String receiver, String content, String type, String url) {
+	// 	Alarm alarm = createNotification(receiver, content, type, url);
+	// 	Map<String, SseEmitter> sseEmitters = sseRepository.findAllEmitterStartsWithUsername(receiver);
+	// 	sseEmitters.forEach((key, sseEmitter) -> {
+	// 		log.info("key, notification : {}, {}", key, alarm);
+	// 		sseRepository.saveEventCache(key, alarm);
+	// 		emitEventToClient(sseEmitter, key, alarm);
+	// 	});
+	// }
 
 	@Async
 	@Scheduled(fixedRate = 60000) // Every 1 minute
@@ -101,6 +102,16 @@ public class AlarmServiceImpl implements AlarmService {
 			.orElseThrow(() -> new IllegalArgumentException("Product not found"));
 		User user = userRepository.findByAccount(username)
 			.orElseThrow(() -> new IllegalArgumentException("User not found"));
+		if (request.getFcmToken() != null && !request.getFcmToken().isEmpty()) {
+			if (user.getFcmTokens().stream().noneMatch(token -> token.getToken().equals(request.getFcmToken()))) {
+				FcmToken fcmToken = FcmToken.builder()
+					.token(request.getFcmToken())
+					.user(user)
+					.build();
+				user.addFcmToken(fcmToken);
+			}
+		}
+
 		Alarm alarm = Alarm.builder()
 			.user(user)
 			.product(product)
@@ -115,15 +126,11 @@ public class AlarmServiceImpl implements AlarmService {
 	public String sendAlarmByToken(AlarmRequestDTO.FCMAlarmRequestDTO request) {
 		Optional<User> user = userRepository.findById(request.getUserId());
 		if(user.isPresent()){
-			if(user.get().getFirebaseToken() != null){
+			if(user.get().getFcmTokens() != null){
 				Alarm alarm = Alarm.builder()
 					.user(user.get())
 					.content(request.getBody())
 					.status(AlarmStatus.ACTIVE)
-					.build();
-				Message message = Message.builder()
-					.setToken(user.get().getFirebaseToken())
-					.setNotification(alarm)
 					.build();
 			}
 			try{
@@ -141,31 +148,31 @@ public class AlarmServiceImpl implements AlarmService {
 		}
 	}
 
-	private Alarm createDummyNotification(String receiver) {
-		return Alarm.builder()
-			.content("Dummy notification")
-			.url("")
-			.status(AlarmStatus.ACTIVE)
-			.build();
-	}
-
-	private Alarm createNotification(String receiver, String content, String type, String url) {
-		User user = userRepository.findByAccount(receiver)
-			.orElseThrow(() -> new IllegalArgumentException("User not found"));
-		return Alarm.builder()
-			.user(user)
-			.content(content)
-			.url(url)
-			.status(AlarmStatus.ACTIVE)
-			.build();
-	}
-
-	private void emitEventToClient(SseEmitter sseEmitter, String key, Object data) {
-		try {
-			sseEmitter.send(SseEmitter.event().name(NOTIFICATION_NAME).id(key).data(data));
-		} catch (Exception e) {
-			sseRepository.deleteEmitterById(key);
-		}
-	}
+	// private Alarm createDummyNotification(String receiver) {
+	// 	return Alarm.builder()
+	// 		.content("Dummy notification")
+	// 		.url("")
+	// 		.status(AlarmStatus.ACTIVE)
+	// 		.build();
+	// }
+	//
+	// private Alarm createNotification(String receiver, String content, String type, String url) {
+	// 	User user = userRepository.findByAccount(receiver)
+	// 		.orElseThrow(() -> new IllegalArgumentException("User not found"));
+	// 	return Alarm.builder()
+	// 		.user(user)
+	// 		.content(content)
+	// 		.url(url)
+	// 		.status(AlarmStatus.ACTIVE)
+	// 		.build();
+	// }
+	//
+	// private void emitEventToClient(SseEmitter sseEmitter, String key, Object data) {
+	// 	try {
+	// 		sseEmitter.send(SseEmitter.event().name(NOTIFICATION_NAME).id(key).data(data));
+	// 	} catch (Exception e) {
+	// 		sseRepository.deleteEmitterById(key);
+	// 	}
+	// }
 
 }
