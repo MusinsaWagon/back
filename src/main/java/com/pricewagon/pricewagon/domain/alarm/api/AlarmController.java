@@ -45,8 +45,15 @@ public class AlarmController {
 
 	@Operation(summary = "알람 전송", description = "알람 전송하는 기능")
 	@PostMapping("/send")
-	public ResponseEntity<String> sendAlarm(@RequestBody AlarmRequestDTO.sendAlarmDTO request) {
-		String response = alarmService.sendAlarmTo(request);
+	public ResponseEntity<String> sendAlarm(@RequestBody AlarmRequestDTO.FCMAlarmRequestDTO request) {
+		String response = alarmService.sendAlarmByToken(request);
 		return ResponseEntity.ok(response);
+	}
+
+	@Operation(summary = "알림 보내기", description = "알림 보내기")
+	@PostMapping("/send")
+	public ResponseEntity<Void> sendAlarm(@RequestBody AlarmRequestDTO.sendAlarm request) {
+		alarmService.sendAlarm(request);
+		return ResponseEntity.ok().build();
 	}
 }
