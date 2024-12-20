@@ -56,10 +56,4 @@ public class Alarm extends CreatedDateEntity {
 	@Column(nullable = false)
 	private AlarmStatus status;
 
-	@Column
-	private String url;
-
-	@Column
-	private String content;
-
 }

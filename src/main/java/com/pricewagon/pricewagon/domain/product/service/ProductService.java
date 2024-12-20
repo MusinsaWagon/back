@@ -21,6 +21,8 @@ import com.pricewagon.pricewagon.domain.product.entity.Product;
 import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 import com.pricewagon.pricewagon.domain.product.repository.ProductRepository;
 import com.pricewagon.pricewagon.domain.product.specification.ProductSpecification;
+import com.pricewagon.pricewagon.global.error.exception.CustomException;
+import com.pricewagon.pricewagon.global.error.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
 
@@ -110,8 +112,8 @@ public class ProductService {
 
 	public boolean isPriceBelowDesired(Alarm alarm) {
 
-		Integer currentPrice = productRepository.findById(Math.toIntExact(alarm.getProduct().getId()))
-			.orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."))
+		Integer currentPrice = productRepository.findById(alarm.getProduct().getId())
+			.orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND))
 			.getCurrentPrice();
 		return currentPrice <= alarm.getDesired_price();
 	}

@@ -1,5 +1,7 @@
 package com.pricewagon.pricewagon.domain.alarm.dto;
 
+import java.time.LocalDateTime;
+
 import lombok.Getter;
 
 public class AlarmRequestDTO {
@@ -7,21 +9,8 @@ public class AlarmRequestDTO {
 	public static class registerAlarm {
 		Integer price;
 		Integer productId;
+		LocalDateTime endDate;
 		String fcmToken;
-	}
-
-	@Getter
-	public static class sendAlarmDTO {
-		String token;
-		String title;
-		String body;
-	}
-
-	@Getter
-	public static class FCMAlarmRequestDTO {
-		Long userId;
-		String title;
-		String body;
 	}
 
 }
