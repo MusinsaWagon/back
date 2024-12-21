@@ -2,6 +2,7 @@ package com.pricewagon.pricewagon.domain.product.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -69,17 +70,26 @@ public class ProductService {
 	// 카테고리, 쇼핑몰, 페이지 수로 상품 리스트 조회
 	public List<BasicProductInfo> getBasicProductsByCategory(ShopType shopType, Pageable pageable,
 		Long parentCategoryId) {
+		Page<Product> productPage;
 
-		// 부모, 모든 자식 카테고리 id
-		List<Long> categoriesId = categoryService.getAllCategoryIds(parentCategoryId);
+		// 전체 상품 조회 categoryId = 0
+		if (parentCategoryId == 0) {
+			productPage = productRepository.findAllByShopType(shopType, pageable);
+		} else {
+			// parentCategoryId에 대한 상품 조회
+			List<Long> categoriesId = categoryService.getAllCategoryIds(parentCategoryId);
+			productPage = productRepository.findByShopTypeAndCategory_IdIn(shopType, categoriesId, pageable);
+		}
 
-		return productRepository.findByShopTypeAndCategory_IdIn(shopType, categoriesId, pageable)
-			.stream()
-			.map(product -> {
-				Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
-				return BasicProductInfo.createHistoryOf(product, previousPrice);
-			})
+		return productPage.stream()
+			.map(this::convertToBasicProductInfo)
 			.toList();
+	}
+
+	// 변환 로직 분리
+	private BasicProductInfo convertToBasicProductInfo(Product product) {
+		Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
+		return BasicProductInfo.createHistoryOf(product, previousPrice);
 	}
 
 	@Transactional(readOnly = true)
