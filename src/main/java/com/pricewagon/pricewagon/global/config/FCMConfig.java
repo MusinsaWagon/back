@@ -18,7 +18,7 @@ public class FCMConfig {
 	@Bean
 	FirebaseMessaging firebaseMessaging() throws IOException {
 		ClassPathResource resource = new ClassPathResource(
-			"resources/firebase/costflower-7be37-firebase-adminsdk-yp96f-165ad33ffe.json");
+			"resources/firebase/fcm.json");
 		InputStream refreshToken = resource.getInputStream();
 		FirebaseApp firebaseApp = null;
 		List<FirebaseApp> firebaseAppList = FirebaseApp.getApps();
