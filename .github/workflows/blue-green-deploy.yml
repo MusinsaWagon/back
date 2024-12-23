@@ -26,7 +26,9 @@ jobs:
 
       - name: FCM 파일 생성
         run: |
-          cd ./src/main/resources/firebase
+          cd ./src/main/resources
+          mkdir firebase
+          cd ./firebase
           touch fcm.json
           echo "$FCM" > fcm.json
         env:
