@@ -30,7 +30,7 @@ jobs:
           touch fcm.json
           echo "$FCM" > fcm.json
         env:
-          ENV: ${{ secrets.$FCM }}
+          ENV: ${{ secrets.FCM }}
         shell: bash
 
       - name: Gradle 권한 부여
