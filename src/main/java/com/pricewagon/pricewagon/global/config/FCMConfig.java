@@ -13,28 +13,44 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Configuration
+@Slf4j
 public class FCMConfig {
+
 	@Bean
-	FirebaseMessaging firebaseMessaging() throws IOException {
+	public FirebaseMessaging firebaseMessaging() throws IOException {
+		// 경로 수정: "resources/" 생략
 		ClassPathResource resource = new ClassPathResource(
-			"resources/firebase/fcm.json");
+			"firebase/fcm.json");
 		InputStream refreshToken = resource.getInputStream();
+
 		FirebaseApp firebaseApp = null;
 		List<FirebaseApp> firebaseAppList = FirebaseApp.getApps();
 
+		// FirebaseApp 존재 여부 확인
 		if (firebaseAppList != null && !firebaseAppList.isEmpty()) {
 			for (FirebaseApp app : firebaseAppList) {
 				if (app.getName().equals(FirebaseApp.DEFAULT_APP_NAME)) {
 					firebaseApp = app;
+					log.info("파이어베이스 초기화: {}", app.getName());
 				}
 			}
-		} else {
+		}
+
+		// FirebaseApp 초기화
+		if (firebaseApp == null) {
 			FirebaseOptions options = FirebaseOptions.builder()
 				.setCredentials(GoogleCredentials.fromStream(refreshToken))
 				.build();
-			firebaseApp = FirebaseApp.initializeApp();
+			firebaseApp = FirebaseApp.initializeApp(options);
+			log.info("파이어베이스 초기화: {}", firebaseApp.getName());
 		}
-		return FirebaseMessaging.getInstance(firebaseApp);
+
+		FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance(firebaseApp);
+		log.info("파이어베이스 성공적으로 생성완료");
+
+		return firebaseMessaging;
 	}
 }
