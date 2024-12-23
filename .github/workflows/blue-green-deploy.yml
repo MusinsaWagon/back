@@ -23,17 +23,17 @@ jobs:
         env:
           ENV: ${{ secrets.ENV }}
         shell: bash
-
-      - name: FCM 파일 생성
-        run: |
-          cd ./src/main/resources
-          mkdir firebase
-          cd ./firebase
-          touch fcm.json
-          echo "$FCM" > fcm.json
-        env:
-          ENV: ${{ secrets.FCM }}
-        shell: bash
+      #
+      #      - name: FCM 파일 생성
+      #        run: |
+      #          cd ./src/main/resources
+      #          mkdir firebase
+      #          cd ./firebase
+      #          touch fcm.json
+      #          echo "$FCM" > fcm.json
+      #        env:
+      #          ENV: ${{ secrets.FCM }}
+      #        shell: bash
 
       - name: Gradle 권한 부여
         run: chmod +x gradlew
