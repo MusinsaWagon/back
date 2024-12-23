@@ -38,7 +38,7 @@ out/
 
 ### Custom ###
 *.env
-/src/main/resources/firebase/*.json
+#/src/main/resources/firebase/*.json
 *.DS_Store
 /src/main/generated
 application.properties
