@@ -63,11 +63,16 @@ public class AlarmServiceImpl implements AlarmService {
 	private boolean sendNotification(User user, String messageBody) {
 
 		List<FcmToken> fcmTokens = user.getFcmTokens();
-		if (fcmTokens.isEmpty()) {
+		if (fcmTokens == null || fcmTokens.isEmpty()) {
+			log.warn("푸시 알림 전송 실패: FCM 토큰이 없습니다. 사용자: " + user.getAccount());
 			return false;
 		}
 		boolean allNotificationsSent = true;
+
+		log.debug("푸시 알림 전송 시작: 사용자: " + user.getAccount());
+
 		for (FcmToken token : fcmTokens) {
+			log.debug("푸시 알림 전송 중: 사용자: " + user.getAccount() + ", FCM 토큰: " + token.getToken());
 			Message message = Message.builder()
 				.setToken(token.getToken())
 				.putData("title", "costFlower")
@@ -81,6 +86,7 @@ public class AlarmServiceImpl implements AlarmService {
 				allNotificationsSent = false;
 			}
 		}
+		log.debug("푸시 알림 전송 완료: 사용자: " + user.getAccount() + ", 결과: " + allNotificationsSent);
 		return allNotificationsSent;
 	}
 
