@@ -44,9 +44,10 @@ public class AlarmServiceImpl implements AlarmService {
 		List<Alarm> activeAlarms = alarmRepository.findByStatus(AlarmStatus.ACTIVE);
 
 		for (Alarm alarm : activeAlarms) {
+			AlarmRequestDTO.productDTO productDTO = productRepository.findProductDTOById(alarm.getProduct().getId());
 			if (productService.isPriceBelowDesired(alarm)) {
 				String messageBody =
-					alarm.getProduct().getName() + "의 가격이 " + alarm.getDesired_price() + "원 이하로 떨어졌습니다.";
+					productDTO.getProductName() + "의 가격이 " + productDTO.getPrice() + "원 이하로 떨어졌습니다.";
 				boolean notificationSent = sendNotification(alarm.getUser(), messageBody);
 				if (notificationSent) {
 					alarm.setStatus(AlarmStatus.INACTIVE);
