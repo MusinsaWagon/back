@@ -1,5 +1,6 @@
 package com.pricewagon.pricewagon.domain.alarm.service.AlarmService;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.scheduling.annotation.Async;
@@ -64,29 +65,49 @@ public class AlarmServiceImpl implements AlarmService {
 
 		List<FcmToken> fcmTokens = user.getFcmTokens();
 		if (fcmTokens == null || fcmTokens.isEmpty()) {
-			log.warn("푸시 알림 전송 실패: FCM 토큰이 없습니다. 사용자: " + user.getAccount());
+			log.warn("푸시 알림 전송 실패: FCM 토큰이 없습니다. 사용자: {}", user.getAccount());
 			return false;
 		}
+
 		boolean allNotificationsSent = true;
 
-		log.debug("푸시 알림 전송 시작: 사용자: " + user.getAccount());
+		log.debug("푸시 알림 전송 시작: 사용자: {}", user.getAccount());
 
-		for (FcmToken token : fcmTokens) {
-			log.debug("푸시 알림 전송 중: 사용자: " + user.getAccount() + ", FCM 토큰: " + token.getToken());
+		Iterator<FcmToken> iterator = fcmTokens.iterator();
+		while (iterator.hasNext()) {
+			FcmToken token = iterator.next();
+			log.debug("푸시 알림 전송 중: 사용자: {}, FCM 토큰: {}", user.getAccount(), token.getToken());
+
 			Message message = Message.builder()
 				.setToken(token.getToken())
 				.putData("title", "costFlower")
 				.putData("body", messageBody)
 				.build();
+
 			try {
 				firebaseMessaging.send(message);
-				log.info("푸시 알림이 성공적으로 전송되었습니다");
+				log.info("푸시 알림이 성공적으로 전송되었습니다. 사용자: {}, FCM 토큰: {}", user.getAccount(), token.getToken());
 			} catch (FirebaseMessagingException e) {
-				log.error("푸시 알림 전송에 실패하였습니다", e);
+				log.error("푸시 알림 전송 실패: 사용자: {}, FCM 토큰: {}, 이유: {}", user.getAccount(), token.getToken(),
+					e.getMessage());
+
+				// UNREGISTERED 에러 처리: 무효화된 토큰 제거
+				if ("UNREGISTERED".equals(e.getMessagingErrorCode().name())) {
+					log.warn("유효하지 않은 FCM 토큰을 제거합니다. 사용자: {}, FCM 토큰: {}", user.getAccount(), token.getToken());
+					iterator.remove();
+					user.removeFcmToken(token);
+				}
+
 				allNotificationsSent = false;
 			}
 		}
-		log.debug("푸시 알림 전송 완료: 사용자: " + user.getAccount() + ", 결과: " + allNotificationsSent);
+
+		if (!allNotificationsSent) {
+			userRepository.save(user);
+			log.info("FCM 토큰 변경사항이 사용자 데이터베이스에 저장되었습니다. 사용자: {}", user.getAccount());
+		}
+
+		log.debug("푸시 알림 전송 완료: 사용자: {}, 결과: {}", user.getAccount(), allNotificationsSent);
 		return allNotificationsSent;
 	}
 
