@@ -64,4 +64,9 @@ public class User extends FullTimeAuditEntity {
 		token.setUser(this);
 	}
 
+	public void removeFcmToken(FcmToken token) {
+		this.fcmTokens.remove(token);
+		token.setUser(null);
+	}
+
 }
