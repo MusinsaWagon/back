@@ -6,12 +6,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-import com.pricewagon.pricewagon.domain.alarm.dto.AlarmRequestDTO;
 import com.pricewagon.pricewagon.domain.product.entity.Product;
-import com.pricewagon.pricewagon.domain.product.entity.QProduct;
 import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 import com.pricewagon.pricewagon.domain.product.repository.ProductRepositoryCustom;
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -63,19 +60,4 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 		return lastProductId == null ? null : product.id.gt(lastProductId);
 	}
 
-	@Override
-	public AlarmRequestDTO.productDTO findProductDTOById(Long productId) {
-		QProduct product = QProduct.product;
-
-		return jpaQueryFactory
-			.select(Projections.constructor(
-				AlarmRequestDTO.productDTO.class,
-				product.id,
-				product.name,
-				product.currentPrice
-			))
-			.from(product)
-			.where(product.id.eq(productId))
-			.fetchOne();
-	}
 }

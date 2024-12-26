@@ -41,18 +41,20 @@ public class AlarmServiceImpl implements AlarmService {
 	@Async
 	@Scheduled(fixedRate = 60000) // Every 1 minute
 	public void checkAllAlarmsAndNotify() {
-		List<Alarm> activeAlarms = alarmRepository.findByStatus(AlarmStatus.ACTIVE);
+		List<Alarm> activeAlarms = alarmRepository.findActiveAlarmsWithDetails(AlarmStatus.ACTIVE);
 
 		for (Alarm alarm : activeAlarms) {
-			AlarmRequestDTO.productDTO productDTO = productRepository.findProductDTOById(alarm.getProduct().getId());
+			Product product = alarm.getProduct();
+			User user = alarm.getUser();
+
 			if (productService.isPriceBelowDesired(alarm)) {
 				String messageBody =
-					productDTO.getProductName() + "의 가격이 " + productDTO.getPrice() + "원 이하로 떨어졌습니다.";
-				boolean notificationSent = sendNotification(alarm.getUser(), messageBody);
+					product.getName() + "의 가격이 " + product.getCurrentPrice() + "원 이하로 떨어졌습니다.";
+				boolean notificationSent = sendNotification(user, messageBody);
 				if (notificationSent) {
 					alarm.setStatus(AlarmStatus.INACTIVE);
 					alarmRepository.save(alarm);
-					log.info("알림이 성공적으로 전송되었습니다." + alarm.getUser().getAccount());
+					log.info("알림이 성공적으로 전송되었습니다." + user.getAccount());
 				}
 			}
 		}
