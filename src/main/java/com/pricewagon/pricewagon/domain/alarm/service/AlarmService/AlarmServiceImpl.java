@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
@@ -61,7 +62,8 @@ public class AlarmServiceImpl implements AlarmService {
 		}
 	}
 
-	private boolean sendNotification(User user, String messageBody) {
+	@Transactional
+	protected boolean sendNotification(User user, String messageBody) {
 
 		List<FcmToken> fcmTokens = user.getFcmTokens();
 		if (fcmTokens == null || fcmTokens.isEmpty()) {
