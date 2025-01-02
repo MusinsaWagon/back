@@ -1,7 +1,5 @@
 package com.pricewagon.pricewagon.domain.alarm.dto;
 
-import java.time.LocalDateTime;
-
 import lombok.Getter;
 
 public class AlarmRequestDTO {
@@ -9,7 +7,6 @@ public class AlarmRequestDTO {
 	public static class registerAlarm {
 		Integer price;
 		Integer productId;
-		LocalDateTime endDate;
 		String fcmToken;
 	}
 
