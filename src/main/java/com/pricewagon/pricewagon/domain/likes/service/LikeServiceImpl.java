@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 
 import com.pricewagon.pricewagon.domain.likes.dto.LikeResponseDTO;
-import com.pricewagon.pricewagon.domain.likes.entity.Like;
+import com.pricewagon.pricewagon.domain.likes.entity.Likes;
 import com.pricewagon.pricewagon.domain.likes.repository.LikeRepository;
 import com.pricewagon.pricewagon.domain.product.entity.Product;
 import com.pricewagon.pricewagon.domain.product.repository.ProductRepository;
@@ -38,7 +38,7 @@ public class LikeServiceImpl implements LikeService {
 			throw new CustomException(ErrorCode.ALREADY_LIKED);
 		}
 
-		Like like = Like.builder()
+		Likes like = Likes.builder()
 			.product(product)
 			.user(user)
 			.likedAt(LocalDateTime.now())
@@ -60,7 +60,7 @@ public class LikeServiceImpl implements LikeService {
 		Product product = productRepository.findById(productId)
 			.orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
 
-		Like like = likeRepository.findByUserAndProduct(user, product)
+		Likes like = likeRepository.findByUserAndProduct(user, product)
 			.orElseThrow(() -> new CustomException(ErrorCode.ALREADY_LIKED));
 
 		likeRepository.delete(like);
