@@ -8,7 +8,7 @@ import org.hibernate.annotations.Comment;
 import com.pricewagon.pricewagon.domain.alarm.entity.Alarm;
 import com.pricewagon.pricewagon.domain.common.FullTimeAuditEntity;
 import com.pricewagon.pricewagon.domain.fcm.entity.FcmToken;
-import com.pricewagon.pricewagon.domain.likes.entity.Like;
+import com.pricewagon.pricewagon.domain.likes.entity.Likes;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -61,7 +61,7 @@ public class User extends FullTimeAuditEntity {
 	private List<FcmToken> fcmTokens = new ArrayList<>();
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Like> likes = new ArrayList<>();
+	private List<Likes> likes = new ArrayList<>();
 
 	public void addFcmToken(FcmToken token) {
 		this.fcmTokens.add(token);
