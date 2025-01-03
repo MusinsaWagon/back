@@ -10,6 +10,7 @@ import com.pricewagon.pricewagon.domain.alarm.entity.Alarm;
 import com.pricewagon.pricewagon.domain.category.entity.Category;
 import com.pricewagon.pricewagon.domain.common.FullDateAuditEntity;
 import com.pricewagon.pricewagon.domain.history.entity.ProductHistory;
+import com.pricewagon.pricewagon.domain.likes.entity.Likes;
 import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 
 import jakarta.persistence.CascadeType;
@@ -90,6 +91,9 @@ public class Product extends FullDateAuditEntity {
 
 	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Alarm> alarms = new ArrayList<>();
+
+	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Likes> likes = new ArrayList<>();
 
 	@Builder
 	public Product(String imgUrl, String name, Integer productNumber, String brand, Integer currentPrice,
