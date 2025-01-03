@@ -61,7 +61,7 @@ public class LikeServiceImpl implements LikeService {
 			.orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
 
 		Likes like = likeRepository.findByUserAndProduct(user, product)
-			.orElseThrow(() -> new CustomException(ErrorCode.ALREADY_LIKED));
+			.orElseThrow(() -> new CustomException(ErrorCode.LIKE_NOT_FOUND));
 
 		likeRepository.delete(like);
 
