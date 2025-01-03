@@ -23,7 +23,10 @@ public enum ErrorCode implements ErrorCodeStatus {
 	INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
 
 	//상품 관련 오류
-	PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품을 찾을 수 없습니다.");
+	PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품을 찾을 수 없습니다."),
+
+	//좋아요 관련 오류
+	ALREADY_LIKED(HttpStatus.BAD_REQUEST, "이미 좋아요를 누른 상품입니다.");
 
 	private final HttpStatus httpStatus;
 	private final String message;
