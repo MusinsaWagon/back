@@ -3,6 +3,7 @@ package com.pricewagon.pricewagon.domain.product.api;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +20,7 @@ import com.pricewagon.pricewagon.domain.product.dto.response.ProductSearchRespon
 import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 import com.pricewagon.pricewagon.domain.product.service.ProductRegistrationService;
 import com.pricewagon.pricewagon.domain.product.service.ProductService;
+import com.pricewagon.pricewagon.global.config.security.CustomUserDetails;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,18 +40,20 @@ public class ProductController {
 	public List<BasicProductInfo> getProductsByShopType(
 		@PathVariable ShopType shopType,
 		@RequestParam(required = false) Integer lastId,
-		@RequestParam(defaultValue = "10") int size
+		@RequestParam(defaultValue = "10") int size,
+		@AuthenticationPrincipal CustomUserDetails userDetails
 	) {
-		return productService.getProductsByShopType(shopType, lastId, size);
+		return productService.getProductsByShopType(shopType, lastId, size, userDetails);
 	}
 
 	@Operation(summary = "개별 상품 정보 조최", description = "특정 상품에 대한 정보")
 	@GetMapping("/{shopType}/{productNumber}")
 	public IndividualProductInfo getIndividualProductInfo(
 		@PathVariable ShopType shopType,
-		@PathVariable Integer productNumber
+		@PathVariable Integer productNumber,
+		@AuthenticationPrincipal CustomUserDetails userDetails
 	) {
-		return productService.getIndividualProductInfo(shopType, productNumber);
+		return productService.getIndividualProductInfo(shopType, productNumber, userDetails);
 	}
 
 	@Operation(summary = "상위 카테고리에 속한 모든 상품조회", description = "카테고리에 속한 기본 상품정보")
@@ -86,14 +90,18 @@ public class ProductController {
 	) {
 		return productService.searchProducts(name, lastId, size);
 	}
-	// @Operation(summary="좋아요 기준 인기 상품 조회", description="좋아요 많이 등록한  기준 인기 상품 조회")
-	// @GetMapping("/popular")
-	// public List<BasicProductInfo> getPopularProducts(
-	// 	@RequestParam(defaultValue = "10") int size
-	// ) {
-	// 	return productService.getPopularProducts(size);
-	// }
-	//
+
+	@Operation(summary = "좋아요 기준 인기 상품 조회", description = "좋아요 많이 등록한  기준 인기 상품 조회")
+	@GetMapping("/popular/{shopType}")
+	public List<BasicProductInfo> getPopularProducts(
+		@PathVariable ShopType shopType,
+		@RequestParam(required = false) Integer lastId,
+		@RequestParam(defaultValue = "10") int size,
+		@AuthenticationPrincipal CustomUserDetails userDetails
+	) {
+		return productService.getPopularProducts(shopType, lastId, size, userDetails);
+	}
+
 	// @Operation(summary="알림 기준 인기 상품 조회", description="알림 많이 등록한 순서로 인기 상품 조회")
 
 }

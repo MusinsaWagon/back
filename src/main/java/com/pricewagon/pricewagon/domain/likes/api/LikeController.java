@@ -22,21 +22,12 @@ import lombok.RequiredArgsConstructor;
 public class LikeController {
 	private final LikeService likeService;
 
-	@Operation(summary = "좋아요 등록", description = "좋아요 등록하는 기능")
-	@PostMapping("/{productId}")
+	@Operation(summary = "좋아요 등록 및 삭제", description = "좋아요 등록 및 삭제하는 기능")
+	@PostMapping("/{productNumber}")
 	public ResponseEntity<LikeResponseDTO.registerLikeDTO> registerLike(
-		@PathVariable Long productId,
+		@PathVariable Integer productNumber,
 		@AuthenticationPrincipal CustomUserDetails userDetails) {
-		LikeResponseDTO.registerLikeDTO result = likeService.registerLike(productId, userDetails.getUsername());
-		return ResponseEntity.ok(result);
-	}
-
-	@Operation(summary = "좋아요 취소", description = "좋아요 취소하는 기능")
-	@PostMapping("/cancel/{productId}")
-	public ResponseEntity<LikeResponseDTO.registerLikeDTO> cancelLike(
-		@PathVariable Long productId,
-		@AuthenticationPrincipal CustomUserDetails userDetails) {
-		LikeResponseDTO.registerLikeDTO result = likeService.cancelLike(productId, userDetails.getUsername());
+		LikeResponseDTO.registerLikeDTO result = likeService.registerLike(productNumber, userDetails.getUsername());
 		return ResponseEntity.ok(result);
 	}
 
