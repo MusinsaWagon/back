@@ -30,6 +30,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -68,6 +69,7 @@ public class Product extends FullDateAuditEntity {
 	@Column(nullable = false)
 	private Integer reviewCount;
 
+	@Getter
 	@Comment("좋아요 수")
 	@Column(nullable = false)
 	private Integer likeCount;
@@ -94,6 +96,15 @@ public class Product extends FullDateAuditEntity {
 
 	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Likes> likes = new ArrayList<>();
+
+	@Setter
+	@Comment("좋아요 수(사용자 기준)")
+	@Column(nullable = false)
+	private Integer userLikeCount = 0;
+
+	public void updateLikeCount(Integer likeCount) {
+		this.likeCount = likeCount;
+	}
 
 	@Builder
 	public Product(String imgUrl, String name, Integer productNumber, String brand, Integer currentPrice,

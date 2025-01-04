@@ -10,4 +10,6 @@ public interface ProductRepositoryCustom {
 
 	List<Product> findProductsByQueryAndLastId(String name, Integer lastId, int size);
 
+	List<Product> findPopularProductsByShopTypeAndLastId(ShopType shopType, Integer lastId, int size);
+
 }
