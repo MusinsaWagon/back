@@ -115,7 +115,7 @@ public class AlarmServiceImpl implements AlarmService {
 
 	@Override
 	public AlarmResponseDTO.registerAlarmDTO registerAlarm(AlarmRequestDTO.registerAlarm request, String username) {
-		Product product = productRepository.findById(request.getProductId())
+		Product product = productRepository.findByProductNumber(request.getProductNumber())
 			.orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
 		User user = userRepository.findByAccount(username)
 			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
@@ -140,7 +140,7 @@ public class AlarmServiceImpl implements AlarmService {
 		return AlarmResponseDTO.registerAlarmDTO.builder()
 			.price(request.getPrice())
 			.account(username)
-			.productId(request.getProductId())
+			.productNumber(request.getProductNumber())
 			.build();
 	}
 
