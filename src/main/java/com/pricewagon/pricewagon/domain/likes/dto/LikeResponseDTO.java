@@ -11,7 +11,8 @@ public class LikeResponseDTO {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class registerLikeDTO {
-		Long productId;
+		Integer productId;
 		Long userId;
+		String action; // 좋아요 등록, 좋아요 삭제
 	}
 }

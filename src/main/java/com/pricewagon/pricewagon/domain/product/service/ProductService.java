@@ -13,6 +13,7 @@ import com.pricewagon.pricewagon.domain.category.dto.response.ParentAndChildCate
 import com.pricewagon.pricewagon.domain.category.entity.Category;
 import com.pricewagon.pricewagon.domain.category.service.CategoryService;
 import com.pricewagon.pricewagon.domain.history.service.ProductHistoryService;
+import com.pricewagon.pricewagon.domain.likes.repository.LikeRepository;
 import com.pricewagon.pricewagon.domain.product.dto.ProductDto;
 import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
 import com.pricewagon.pricewagon.domain.product.dto.response.BrandSearchResponse;
@@ -22,6 +23,9 @@ import com.pricewagon.pricewagon.domain.product.entity.Product;
 import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 import com.pricewagon.pricewagon.domain.product.repository.ProductRepository;
 import com.pricewagon.pricewagon.domain.product.specification.ProductSpecification;
+import com.pricewagon.pricewagon.domain.user.entity.User;
+import com.pricewagon.pricewagon.domain.user.repository.UserRepository;
+import com.pricewagon.pricewagon.global.config.security.CustomUserDetails;
 import com.pricewagon.pricewagon.global.error.exception.CustomException;
 import com.pricewagon.pricewagon.global.error.exception.ErrorCode;
 
@@ -35,32 +39,61 @@ public class ProductService {
 	private final ProductRepository productRepository;
 	private final ProductHistoryService productHistoryService;
 	private final CategoryService categoryService;
+	private final UserRepository userRepository;
+	private final LikeRepository likeRepository;
 
 	// 쇼핑몰에 따른 상품 리스트 조회
 	@Transactional(readOnly = true)
-	public List<BasicProductInfo> getProductsByShopType(ShopType shopType, Integer lastId, int size) {
+	public List<BasicProductInfo> getProductsByShopType(ShopType shopType, Integer lastId, int size,
+		CustomUserDetails userDetails) {
 		List<Product> products = productRepository.findProductsByShopTypeAndLastId(shopType, lastId, size);
+		User user = userRepository.findByAccount(userDetails.getUsername())
+			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
 		return products.stream()
 			.map(product -> {
 				Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
-				return BasicProductInfo.createHistoryOf(product, previousPrice);
+				boolean isLikedByUser = likeRepository.existsByUserAndProduct(user, product);
+				return BasicProductInfo.createWithLikeStatus(product, previousPrice, isLikedByUser);
+			})
+			.toList();
+	}
+
+	// 좋아요 기반으로 인기 상품 조회
+	@Transactional(readOnly = true)
+	public List<BasicProductInfo> getPopularProducts(ShopType shopType, Integer lastId, int size,
+		CustomUserDetails userDetails) {
+		List<Product> popularProducts = productRepository.findPopularProductsByShopTypeAndLastId(shopType, lastId,
+			size);
+		User user = userRepository.findByAccount(userDetails.getUsername())
+			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+		return popularProducts.stream()
+			.map(product -> {
+				Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
+				boolean isLikedByUser = likeRepository.existsByUserAndProduct(user, product);
+				return BasicProductInfo.createWithLikeStatus(product, previousPrice, isLikedByUser);
 			})
 			.toList();
 	}
 
 	// 개별 상품 정보 조회
 	@Transactional(readOnly = true)
-	public IndividualProductInfo getIndividualProductInfo(ShopType shopType, Integer productNumber) {
+	public IndividualProductInfo getIndividualProductInfo(ShopType shopType, Integer productNumber,
+		CustomUserDetails userDetails) {
 		Product product = productRepository.findByShopTypeAndProductNumber(shopType, productNumber)
 			.orElseThrow(() -> new RuntimeException("존재하지 않는 상품입니다."));
+
+		User user = userRepository.findByAccount(userDetails.getUsername())
+			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
 		Category childCategory = product.getCategory();
 		ParentAndChildCategoryDTO parentAndChildCategoryDTO = categoryService
 			.getParentAndChildCategoryByChildId(childCategory.getId());
 
 		Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
-		BasicProductInfo basicProductInfo = BasicProductInfo.createHistoryOf(product, previousPrice);
+		boolean isLikedByUser = likeRepository.existsByUserAndProduct(user, product);
+		BasicProductInfo basicProductInfo = BasicProductInfo.createWithLikeStatus(product, previousPrice,
+			isLikedByUser);
 
 		return IndividualProductInfo.from(
 			product,

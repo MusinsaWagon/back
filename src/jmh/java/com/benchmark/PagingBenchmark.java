@@ -24,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
 import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 import com.pricewagon.pricewagon.domain.product.service.ProductService;
+import com.pricewagon.pricewagon.global.config.security.CustomUserDetails;
 
 import jakarta.persistence.EntityManager;
 
@@ -39,6 +40,8 @@ public class PagingBenchmark {
 	private ProductService productService;
 	private static final ShopType shopType = ShopType.MUSINSA;
 	private static final int pageSize = 10;
+
+	private static final CustomUserDetails userDetails = new CustomUserDetails(1L, "test", "test", null);
 
 	@TearDown(Level.Invocation) // 밴치마크 메서드 각 호출 시
 	public void clearCache() {
@@ -74,7 +77,8 @@ public class PagingBenchmark {
 	@Benchmark
 	public void testNoOffsetPaging(Blackhole blackhole) {
 		Integer lastId = 149990;
-		List<BasicProductInfo> noOffsetProducts = productService.getProductsByShopType(shopType, lastId, pageSize);
+		List<BasicProductInfo> noOffsetProducts = productService.getProductsByShopType(shopType, lastId, pageSize,
+			userDetails);
 		blackhole.consume(noOffsetProducts);
 	}
 }
