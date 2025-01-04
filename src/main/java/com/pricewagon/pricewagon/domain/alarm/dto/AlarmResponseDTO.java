@@ -12,7 +12,7 @@ public class AlarmResponseDTO {
 	@AllArgsConstructor
 	public static class registerAlarmDTO {
 		Integer price;
-		Integer productId;
+		Integer productNumber;
 		String account;
 	}
 }
