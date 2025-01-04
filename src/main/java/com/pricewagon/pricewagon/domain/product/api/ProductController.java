@@ -86,4 +86,14 @@ public class ProductController {
 	) {
 		return productService.searchProducts(name, lastId, size);
 	}
+	// @Operation(summary="좋아요 기준 인기 상품 조회", description="좋아요 많이 등록한  기준 인기 상품 조회")
+	// @GetMapping("/popular")
+	// public List<BasicProductInfo> getPopularProducts(
+	// 	@RequestParam(defaultValue = "10") int size
+	// ) {
+	// 	return productService.getPopularProducts(size);
+	// }
+	//
+	// @Operation(summary="알림 기준 인기 상품 조회", description="알림 많이 등록한 순서로 인기 상품 조회")
+
 }
