@@ -1,6 +1,7 @@
 package com.pricewagon.pricewagon.domain.likes.service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -26,48 +27,37 @@ public class LikeServiceImpl implements LikeService {
 	private final ProductRepository productRepository;
 
 	@Override
-	public LikeResponseDTO.registerLikeDTO registerLike(Long productId, String username) {
+	public LikeResponseDTO.registerLikeDTO registerLike(Integer productNumber, String username) {
 		User user = userRepository.findByAccount(username)
 			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-		Product product = productRepository.findById(productId)
+		Product product = productRepository.findByProductNumber(productNumber)
 			.orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
 
-		boolean exists = likeRepository.existsByUserAndProduct(user, product);
-		if (exists) {
-			throw new CustomException(ErrorCode.ALREADY_LIKED);
+		Optional<Likes> like = likeRepository.findByUserAndProduct(user, product);
+		if (like.isPresent()) { // 좋아요 삭제
+			likeRepository.delete(like.get());
+			product.updateLikeCount(product.getLikeCount() - 1);
+			return LikeResponseDTO.registerLikeDTO.builder()
+				.productId(productNumber)
+				.userId(user.getId())
+				.action("좋아요 삭제")
+				.build();
+		} else {
+			Likes newLike = Likes.builder()
+				.user(user)
+				.product(product)
+				.likedAt(LocalDateTime.now())
+				.build();
+			likeRepository.save(newLike);
+			product.updateLikeCount(product.getLikeCount() + 1);
+			return LikeResponseDTO.registerLikeDTO.builder()
+				.productId(productNumber)
+				.userId(user.getId())
+				.action("좋아요 등록")
+				.build();
 		}
 
-		Likes like = Likes.builder()
-			.product(product)
-			.user(user)
-			.likedAt(LocalDateTime.now())
-			.build();
-		likeRepository.save(like);
-
-		return LikeResponseDTO.registerLikeDTO.builder()
-			.productId(productId)
-			.userId(user.getId())
-			.build();
-
 	}
 
-	@Override
-	public LikeResponseDTO.registerLikeDTO cancelLike(Long productId, String username) {
-		User user = userRepository.findByAccount(username)
-			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-
-		Product product = productRepository.findById(productId)
-			.orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
-
-		Likes like = likeRepository.findByUserAndProduct(user, product)
-			.orElseThrow(() -> new CustomException(ErrorCode.ALREADY_LIKED));
-
-		likeRepository.delete(like);
-
-		return LikeResponseDTO.registerLikeDTO.builder()
-			.productId(productId)
-			.userId(user.getId())
-			.build();
-	}
 }

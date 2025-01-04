@@ -15,7 +15,9 @@ public record BasicProductInfo(
 	String imgUrl,
 	ShopType shopType,
 	Integer currentPrice,
-	Integer previousPrice
+	Integer previousPrice,
+
+	boolean isLiked
 
 ) {
 	public static BasicProductInfo createHistoryOf(Product product, Integer previousPrice) {
@@ -25,11 +27,28 @@ public record BasicProductInfo(
 			product.getBrand(),
 			product.getStarScore(),
 			product.getReviewCount(),
-			product.getLikeCount(),
+			product.getUserLikeCount(),
 			product.getImgUrl(),
 			product.getShopType(),
 			product.getCurrentPrice(),
-			previousPrice
+			previousPrice,
+			false
+		);
+	}
+
+	public static BasicProductInfo createWithLikeStatus(Product product, Integer previousPrice, boolean isLiked) {
+		return new BasicProductInfo(
+			product.getProductNumber(),
+			product.getName(),
+			product.getBrand(),
+			product.getStarScore(),
+			product.getReviewCount(),
+			product.getUserLikeCount(),
+			product.getImgUrl(),
+			product.getShopType(),
+			product.getCurrentPrice(),
+			previousPrice,
+			isLiked
 		);
 	}
 }
