@@ -35,7 +35,7 @@ public class ProductController {
 	private final ProductService productService;
 	private final ProductRegistrationService registrationService;
 
-	@Operation(summary = "전체상품 페이지별 조회", description = "쇼핑몰별 모든 상품")
+	@Operation(summary = "전체상품 페이지별 조회", description = "쇼핑몰별 모든 상품(토큰 필요)")
 	@GetMapping("/{shopType}")
 	public List<BasicProductInfo> getProductsByShopType(
 		@PathVariable ShopType shopType,
@@ -46,7 +46,7 @@ public class ProductController {
 		return productService.getProductsByShopType(shopType, lastId, size, userDetails);
 	}
 
-	@Operation(summary = "개별 상품 정보 조최", description = "특정 상품에 대한 정보")
+	@Operation(summary = "개별 상품 정보 조최", description = "특정 상품에 대한 정보(토큰 필요)")
 	@GetMapping("/{shopType}/{productNumber}")
 	public IndividualProductInfo getIndividualProductInfo(
 		@PathVariable ShopType shopType,
@@ -91,7 +91,7 @@ public class ProductController {
 		return productService.searchProducts(name, lastId, size);
 	}
 
-	@Operation(summary = "좋아요 기준 인기 상품 조회", description = "좋아요 많이 등록한  기준 인기 상품 조회")
+	@Operation(summary = "좋아요 기준 인기 상품 조회", description = "좋아요 많이 등록한  기준 인기 상품 조회(토큰 필요)")
 	@GetMapping("/popular/{shopType}")
 	public List<BasicProductInfo> getPopularProducts(
 		@PathVariable ShopType shopType,

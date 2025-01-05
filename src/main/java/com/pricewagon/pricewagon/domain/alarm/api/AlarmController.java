@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class AlarmController {
 	private final AlarmService alarmService;
 
-	@Operation(summary = "알람 등록", description = "알람 등록하는 기능")
+	@Operation(summary = "알람 등록", description = "알람 등록하는 기능 (토큰 필요)")
 	@PostMapping("/register")
 	public ResponseEntity<AlarmResponseDTO.registerAlarmDTO> registerAlarm(
 		@RequestBody AlarmRequestDTO.registerAlarm request,
