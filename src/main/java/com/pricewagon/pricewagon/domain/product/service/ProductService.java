@@ -75,6 +75,23 @@ public class ProductService {
 			})
 			.toList();
 	}
+	
+	// 알람 기반으로 인기 상품 조회
+	@Transactional(readOnly = true)
+	public List<BasicProductInfo> getPopularProductsByAlarm(ShopType shopType, Integer lastId, int size,
+		CustomUserDetails userDetails) {
+		List<Product> popularProducts = productRepository.findAlarmProductsByShopTypeAndLastId(shopType, lastId,
+			size);
+		User user = userRepository.findByAccount(userDetails.getUsername())
+			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+		return popularProducts.stream()
+			.map(product -> {
+				Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
+				boolean isLikedByUser = likeRepository.existsByUserAndProduct(user, product);
+				return BasicProductInfo.createWithLikeStatus(product, previousPrice, isLikedByUser);
+			})
+			.toList();
+	}
 
 	// 개별 상품 정보 조회
 	@Transactional(readOnly = true)

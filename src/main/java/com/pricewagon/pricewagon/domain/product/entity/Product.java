@@ -102,8 +102,16 @@ public class Product extends FullDateAuditEntity {
 	@Column(nullable = false)
 	private Integer userLikeCount = 0;
 
+	@Comment("알람 등록된 수")
+	@Column(nullable = false)
+	private Integer alarmCount = 0;
+
 	public void updateLikeCount(Integer likeCount) {
 		this.likeCount = likeCount;
+	}
+
+	public void updateAlarmCount(Integer alarmCount) {
+		this.alarmCount = alarmCount;
 	}
 
 	@Builder

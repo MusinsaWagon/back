@@ -102,6 +102,15 @@ public class ProductController {
 		return productService.getPopularProducts(shopType, lastId, size, userDetails);
 	}
 
-	// @Operation(summary="알림 기준 인기 상품 조회", description="알림 많이 등록한 순서로 인기 상품 조회")
+	@Operation(summary = "알람 기준 인기 상품 조회", description = "알람 많이 등록한  기준 인기 상품 조회(토큰 필요)")
+	@GetMapping("/alarm/{shopType}")
+	public List<BasicProductInfo> getAlarmProducts(
+		@PathVariable ShopType shopType,
+		@RequestParam(required = false) Integer lastId,
+		@RequestParam(defaultValue = "10") int size,
+		@AuthenticationPrincipal CustomUserDetails userDetails
+	) {
+		return productService.getPopularProductsByAlarm(shopType, lastId, size, userDetails);
+	}
 
 }
