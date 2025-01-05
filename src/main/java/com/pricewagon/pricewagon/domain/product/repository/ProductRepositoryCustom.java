@@ -12,4 +12,6 @@ public interface ProductRepositoryCustom {
 
 	List<Product> findPopularProductsByShopTypeAndLastId(ShopType shopType, Integer lastId, int size);
 
+	List<Product> findAlarmProductsByShopTypeAndLastId(ShopType shopType, Integer lastId, int size);
+
 }

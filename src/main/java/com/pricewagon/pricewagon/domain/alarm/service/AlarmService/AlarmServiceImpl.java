@@ -136,6 +136,7 @@ public class AlarmServiceImpl implements AlarmService {
 			.status(AlarmStatus.ACTIVE)
 			.build();
 		alarmRepository.save(alarm);
+		product.updateAlarmCount(product.getAlarmCount() + 1);
 
 		return AlarmResponseDTO.registerAlarmDTO.builder()
 			.price(request.getPrice())

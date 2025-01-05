@@ -57,6 +57,17 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 			.fetch();
 	}
 
+	@Override
+	public List<Product> findAlarmProductsByShopTypeAndLastId(ShopType shopType, Integer lastId, int size) {
+		return jpaQueryFactory
+			.selectFrom(product)
+			.where(product.shopType.eq(shopType),
+				lastId != null ? product.id.lt(lastId) : null)
+			.orderBy(product.alarmCount.desc(), product.id.desc())
+			.limit(size)
+			.fetch();
+	}
+
 	private BooleanExpression createSearchCondition(String query) {
 		if (query == null || query.isBlank()) {
 			return null;
