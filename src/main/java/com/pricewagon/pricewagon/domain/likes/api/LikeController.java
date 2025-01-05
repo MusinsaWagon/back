@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class LikeController {
 	private final LikeService likeService;
 
-	@Operation(summary = "좋아요 등록 및 삭제", description = "좋아요 등록 및 삭제하는 기능")
+	@Operation(summary = "좋아요 등록 및 삭제", description = "좋아요 등록 및 삭제하는 기능(토큰 필요)")
 	@PostMapping("/{productNumber}")
 	public ResponseEntity<LikeResponseDTO.registerLikeDTO> registerLike(
 		@PathVariable Integer productNumber,
