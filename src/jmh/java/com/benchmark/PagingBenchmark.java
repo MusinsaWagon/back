@@ -77,8 +77,7 @@ public class PagingBenchmark {
 	@Benchmark
 	public void testNoOffsetPaging(Blackhole blackhole) {
 		Integer lastId = 149990;
-		List<BasicProductInfo> noOffsetProducts = productService.getProductsByShopType(shopType, lastId, pageSize,
-			userDetails);
+		List<BasicProductInfo> noOffsetProducts = productService.getProductsByShopType(shopType, lastId, pageSize);
 		blackhole.consume(noOffsetProducts);
 	}
 }
