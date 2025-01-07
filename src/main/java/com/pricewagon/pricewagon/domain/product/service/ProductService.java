@@ -44,51 +44,39 @@ public class ProductService {
 
 	// 쇼핑몰에 따른 상품 리스트 조회
 	@Transactional(readOnly = true)
-	public List<BasicProductInfo> getProductsByShopType(ShopType shopType, Integer lastId, int size,
-		CustomUserDetails userDetails) {
+	public List<BasicProductInfo> getProductsByShopType(ShopType shopType, Integer lastId, int size) {
 		List<Product> products = productRepository.findProductsByShopTypeAndLastId(shopType, lastId, size);
-		User user = userRepository.findByAccount(userDetails.getUsername())
-			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-
 		return products.stream()
 			.map(product -> {
 				Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
-				boolean isLikedByUser = likeRepository.existsByUserAndProduct(user, product);
-				return BasicProductInfo.createWithLikeStatus(product, previousPrice, isLikedByUser);
+				return BasicProductInfo.createHistoryOf(product, previousPrice);
 			})
 			.toList();
 	}
 
 	// 좋아요 기반으로 인기 상품 조회
 	@Transactional(readOnly = true)
-	public List<BasicProductInfo> getPopularProducts(ShopType shopType, Integer lastId, int size,
-		CustomUserDetails userDetails) {
+	public List<BasicProductInfo> getPopularProducts(ShopType shopType, Integer lastId, int size) {
 		List<Product> popularProducts = productRepository.findPopularProductsByShopTypeAndLastId(shopType, lastId,
 			size);
-		User user = userRepository.findByAccount(userDetails.getUsername())
-			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
 		return popularProducts.stream()
 			.map(product -> {
 				Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
-				boolean isLikedByUser = likeRepository.existsByUserAndProduct(user, product);
-				return BasicProductInfo.createWithLikeStatus(product, previousPrice, isLikedByUser);
+				return BasicProductInfo.createHistoryOf(product, previousPrice);
 			})
 			.toList();
 	}
-	
+
 	// 알람 기반으로 인기 상품 조회
 	@Transactional(readOnly = true)
-	public List<BasicProductInfo> getPopularProductsByAlarm(ShopType shopType, Integer lastId, int size,
-		CustomUserDetails userDetails) {
+	public List<BasicProductInfo> getPopularProductsByAlarm(ShopType shopType, Integer lastId, int size) {
 		List<Product> popularProducts = productRepository.findAlarmProductsByShopTypeAndLastId(shopType, lastId,
 			size);
-		User user = userRepository.findByAccount(userDetails.getUsername())
-			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 		return popularProducts.stream()
 			.map(product -> {
 				Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
-				boolean isLikedByUser = likeRepository.existsByUserAndProduct(user, product);
-				return BasicProductInfo.createWithLikeStatus(product, previousPrice, isLikedByUser);
+				return BasicProductInfo.createHistoryOf(product, previousPrice);
 			})
 			.toList();
 	}
