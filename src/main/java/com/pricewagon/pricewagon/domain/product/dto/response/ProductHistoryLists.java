@@ -11,7 +11,8 @@ import com.pricewagon.pricewagon.domain.history.entity.ProductHistory;
 public record ProductHistoryLists(
 	List<ProductHistory> oneWeekList,
 	List<ProductHistory> oneMonthList,
-	List<ProductHistory> threeMonthList
+	List<ProductHistory> threeMonthList,
+	LocalDate recentDate
 ) {
 	public static ProductHistoryLists createFrom(List<ProductHistory> allHistories) {
 		LocalDateTime now = LocalDateTime.now();
@@ -20,7 +21,11 @@ public record ProductHistoryLists(
 		List<ProductHistory> oneMonth = filterByDateRange(allHistories, now.minusMonths(1), now, 4);
 		List<ProductHistory> threeMonth = filterByDateRange(allHistories, now.minusMonths(3), now, 12);
 
-		return new ProductHistoryLists(oneWeek, oneMonth, threeMonth);
+		LocalDate recentDate = allHistories.stream()
+			.map(ProductHistory::getCreatedAt)
+			.max(Comparator.naturalOrder())
+			.orElse(null);
+		return new ProductHistoryLists(oneWeek, oneMonth, threeMonth, recentDate);
 	}
 
 	private static List<ProductHistory> filterByDateRange(List<ProductHistory> histories, LocalDateTime start,
