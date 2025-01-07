@@ -15,7 +15,8 @@ public record BasicProductInfo(
 	String imgUrl,
 	ShopType shopType,
 	Integer currentPrice,
-	Integer previousPrice
+	Integer previousPrice,
+	boolean isLiked
 
 ) {
 	public static BasicProductInfo createHistoryOf(Product product, Integer previousPrice) {
@@ -29,7 +30,8 @@ public record BasicProductInfo(
 			product.getImgUrl(),
 			product.getShopType(),
 			product.getCurrentPrice(),
-			previousPrice
+			previousPrice,
+			false
 		);
 	}
 
@@ -44,7 +46,8 @@ public record BasicProductInfo(
 			product.getImgUrl(),
 			product.getShopType(),
 			product.getCurrentPrice(),
-			previousPrice
+			previousPrice,
+			isLiked
 		);
 	}
 }
