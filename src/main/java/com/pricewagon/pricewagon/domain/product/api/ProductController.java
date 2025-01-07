@@ -3,6 +3,8 @@ package com.pricewagon.pricewagon.domain.product.api;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,13 +46,18 @@ public class ProductController {
 		return productService.getProductsByShopType(shopType, lastId, size);
 	}
 
-	@Operation(summary = "개별 상품 정보 조최", description = "특정 상품에 대한 정보")
+	@Operation(summary = "개별 상품 정보 조회", description = "특정 상품에 대한 정보")
 	@GetMapping("/{shopType}/{productNumber}")
 	public IndividualProductInfo getIndividualProductInfo(
 		@PathVariable ShopType shopType,
-		@PathVariable Integer productNumber
+		@PathVariable Integer productNumber,
+		@AuthenticationPrincipal UserDetails userDetails
 	) {
-		return productService.getIndividualProductInfo(shopType, productNumber);
+		if (userDetails != null) {
+			return productService.getIndividualProductInfo(shopType, productNumber, userDetails);
+		} else {
+			return productService.getIndividualProductInfo(shopType, productNumber, null);
+		}
 	}
 
 	@Operation(summary = "상위 카테고리에 속한 모든 상품조회", description = "카테고리에 속한 기본 상품정보")
