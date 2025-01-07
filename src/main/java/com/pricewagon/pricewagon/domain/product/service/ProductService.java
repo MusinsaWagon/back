@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ import com.pricewagon.pricewagon.domain.product.entity.Product;
 import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 import com.pricewagon.pricewagon.domain.product.repository.ProductRepository;
 import com.pricewagon.pricewagon.domain.product.specification.ProductSpecification;
+import com.pricewagon.pricewagon.domain.user.entity.User;
 import com.pricewagon.pricewagon.domain.user.repository.UserRepository;
 import com.pricewagon.pricewagon.global.error.exception.CustomException;
 import com.pricewagon.pricewagon.global.error.exception.ErrorCode;
@@ -81,7 +83,8 @@ public class ProductService {
 
 	// 개별 상품 정보 조회
 	@Transactional(readOnly = true)
-	public IndividualProductInfo getIndividualProductInfo(ShopType shopType, Integer productNumber) {
+	public IndividualProductInfo getIndividualProductInfo(ShopType shopType, Integer productNumber,
+		UserDetails userDetails) {
 		Product product = productRepository.findByShopTypeAndProductNumber(shopType, productNumber)
 			.orElseThrow(() -> new RuntimeException("존재하지 않는 상품입니다."));
 
@@ -90,7 +93,14 @@ public class ProductService {
 			.getParentAndChildCategoryByChildId(childCategory.getId());
 
 		Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
-		BasicProductInfo basicProductInfo = BasicProductInfo.createHistoryOf(product, previousPrice);
+
+		boolean isLiked = false;
+		if (userDetails != null) {
+			User user = userRepository.findByAccount(userDetails.getUsername())
+				.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+			isLiked = likeRepository.existsByUserAndProduct(user, product);
+		}
+		BasicProductInfo basicProductInfo = BasicProductInfo.createWithLikeStatus(product, previousPrice, isLiked);
 
 		return IndividualProductInfo.from(
 			product,
