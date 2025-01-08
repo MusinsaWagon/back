@@ -3,7 +3,6 @@ package com.pricewagon.pricewagon.domain.alarm.service.AlarmService;
 import java.util.Iterator;
 import java.util.List;
 
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +39,6 @@ public class AlarmServiceImpl implements AlarmService {
 	private final FirebaseMessaging firebaseMessaging;
 
 	@Override
-	@Async
 	@Scheduled(fixedRate = 60000) // Every 1 minute
 	public void checkAllAlarmsAndNotify() {
 		List<Alarm> activeAlarms = alarmRepository.findActiveAlarmsWithDetails(AlarmStatus.ACTIVE);
@@ -54,9 +52,8 @@ public class AlarmServiceImpl implements AlarmService {
 					product.getName() + "의 가격이 " + product.getCurrentPrice() + "원 이하로 떨어졌습니다.";
 				boolean notificationSent = sendNotification(user, messageBody);
 				if (notificationSent) {
-					alarm.setStatus(AlarmStatus.INACTIVE);
-					alarmRepository.save(alarm);
-					log.info("알림이 성공적으로 전송되었습니다." + user.getAccount());
+					alarmRepository.updateAlarmStatus(alarm.getId(), AlarmStatus.INACTIVE, AlarmStatus.ACTIVE);
+					log.info("알림이 성공적으로 전송 후 비활성화로 저장하였습니다." + user.getAccount());
 				}
 			}
 		}
@@ -71,14 +68,13 @@ public class AlarmServiceImpl implements AlarmService {
 			return false;
 		}
 
-		boolean allNotificationsSent = true;
+		boolean allNotificationsSent = false;
 
 		log.debug("푸시 알림 전송 시작: 사용자: {}", user.getAccount());
 
 		Iterator<FcmToken> iterator = fcmTokens.iterator();
 		while (iterator.hasNext()) {
 			FcmToken token = iterator.next();
-			log.debug("푸시 알림 전송 중: 사용자: {}, FCM 토큰: {}", user.getAccount(), token.getToken());
 
 			Message message = Message.builder()
 				.setToken(token.getToken())
@@ -88,6 +84,7 @@ public class AlarmServiceImpl implements AlarmService {
 
 			try {
 				firebaseMessaging.send(message);
+				allNotificationsSent = true;
 				log.info("푸시 알림이 성공적으로 전송되었습니다. 사용자: {}, FCM 토큰: {}", user.getAccount(), token.getToken());
 			} catch (FirebaseMessagingException e) {
 				log.error("푸시 알림 전송 실패: 사용자: {}, FCM 토큰: {}, 이유: {}", user.getAccount(), token.getToken(),
@@ -120,12 +117,17 @@ public class AlarmServiceImpl implements AlarmService {
 		User user = userRepository.findByAccount(username)
 			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 		if (request.getFcmToken() != null && !request.getFcmToken().isEmpty()) {
-			if (user.getFcmTokens().stream().noneMatch(token -> token.getToken().equals(request.getFcmToken()))) {
+			boolean tokenExists = user.getFcmTokens().stream()
+				.anyMatch(token -> token.getToken().equals(request.getFcmToken()));
+
+			if (!tokenExists) {
 				FcmToken fcmToken = FcmToken.builder()
 					.token(request.getFcmToken())
 					.user(user)
 					.build();
 				user.addFcmToken(fcmToken);
+				userRepository.save(user);
+				log.info("새로운 FCM 토큰 저장: {}", request.getFcmToken());
 			}
 		}
 
