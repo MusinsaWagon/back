@@ -19,6 +19,7 @@ import com.pricewagon.pricewagon.domain.product.dto.ProductDto;
 import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
 import com.pricewagon.pricewagon.domain.product.dto.response.BrandSearchResponse;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo;
+import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo2;
 import com.pricewagon.pricewagon.domain.product.dto.response.ProductSearchResponse;
 import com.pricewagon.pricewagon.domain.product.entity.Product;
 import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
@@ -103,6 +104,26 @@ public class ProductService {
 		BasicProductInfo basicProductInfo = BasicProductInfo.createWithLikeStatus(product, previousPrice, isLiked);
 
 		return IndividualProductInfo.from(
+			product,
+			basicProductInfo,
+			parentAndChildCategoryDTO
+		);
+	}
+
+	// 개별 상품 정보 조회
+	@Transactional(readOnly = true)
+	public IndividualProductInfo2 getIndividualProductInfo2(ShopType shopType, Integer productNumber) {
+		Product product = productRepository.findByShopTypeAndProductNumber(shopType, productNumber)
+			.orElseThrow(() -> new RuntimeException("존재하지 않는 상품입니다."));
+
+		Category childCategory = product.getCategory();
+		ParentAndChildCategoryDTO parentAndChildCategoryDTO = categoryService
+			.getParentAndChildCategoryByChildId(childCategory.getId());
+
+		Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
+		BasicProductInfo basicProductInfo = BasicProductInfo.createHistoryOf(product, previousPrice);
+
+		return IndividualProductInfo2.from(
 			product,
 			basicProductInfo,
 			parentAndChildCategoryDTO
