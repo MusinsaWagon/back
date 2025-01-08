@@ -17,6 +17,7 @@ import com.pricewagon.pricewagon.domain.product.dto.request.ProductUrlRequest;
 import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
 import com.pricewagon.pricewagon.domain.product.dto.response.BrandSearchResponse;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo;
+import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo2;
 import com.pricewagon.pricewagon.domain.product.dto.response.ProductSearchResponse;
 import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 import com.pricewagon.pricewagon.domain.product.service.ProductRegistrationService;
@@ -58,6 +59,15 @@ public class ProductController {
 		} else {
 			return productService.getIndividualProductInfo(shopType, productNumber, null);
 		}
+	}
+
+	@Operation(summary = "개별 상품 정보 조회 옛 버전", description = "이건 사용 안하는 API 입니다. 포폴 업데이트 후 삭제 예정")
+	@GetMapping("/content/{shopType}/{productNumber}")
+	public IndividualProductInfo2 getIndividualProductInfo2(
+		@PathVariable ShopType shopType,
+		@PathVariable Integer productNumber
+	) {
+		return productService.getIndividualProductInfo2(shopType, productNumber);
 	}
 
 	@Operation(summary = "상위 카테고리에 속한 모든 상품조회", description = "카테고리에 속한 기본 상품정보")
