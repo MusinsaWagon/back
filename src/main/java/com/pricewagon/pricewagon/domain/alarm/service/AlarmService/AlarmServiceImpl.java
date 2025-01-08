@@ -52,11 +52,16 @@ public class AlarmServiceImpl implements AlarmService {
 					product.getName() + "의 가격이 " + product.getCurrentPrice() + "원 이하로 떨어졌습니다.";
 				boolean notificationSent = sendNotification(user, messageBody);
 				if (notificationSent) {
-					alarmRepository.updateAlarmStatus(alarm.getId(), AlarmStatus.INACTIVE, AlarmStatus.ACTIVE);
+					updateAlarmStatus(alarm.getId(), AlarmStatus.INACTIVE, AlarmStatus.ACTIVE);
 					log.info("알림이 성공적으로 전송 후 비활성화로 저장하였습니다." + user.getAccount());
 				}
 			}
 		}
+	}
+
+	@Transactional
+	protected void updateAlarmStatus(Long id, AlarmStatus status, AlarmStatus currentStatus) {
+		alarmRepository.updateAlarmStatus(id, status, currentStatus);
 	}
 
 	@Transactional
