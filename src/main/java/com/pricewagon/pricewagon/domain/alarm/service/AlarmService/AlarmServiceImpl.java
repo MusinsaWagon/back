@@ -3,6 +3,7 @@ package com.pricewagon.pricewagon.domain.alarm.service.AlarmService;
 import java.util.Iterator;
 import java.util.List;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +40,8 @@ public class AlarmServiceImpl implements AlarmService {
 	private final FirebaseMessaging firebaseMessaging;
 
 	@Override
-	@Scheduled(fixedRate = 60000) // Every 1 minute
+	@Async
+	@Scheduled(fixedRate = 120000) // Every 1 minute
 	public void checkAllAlarmsAndNotify() {
 		List<Alarm> activeAlarms = alarmRepository.findActiveAlarmsWithDetails(AlarmStatus.ACTIVE);
 
