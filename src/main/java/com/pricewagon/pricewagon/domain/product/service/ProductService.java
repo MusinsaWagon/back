@@ -3,7 +3,9 @@ package com.pricewagon.pricewagon.domain.product.service;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -15,12 +17,10 @@ import com.pricewagon.pricewagon.domain.category.entity.Category;
 import com.pricewagon.pricewagon.domain.category.service.CategoryService;
 import com.pricewagon.pricewagon.domain.history.service.ProductHistoryService;
 import com.pricewagon.pricewagon.domain.likes.repository.LikeRepository;
-import com.pricewagon.pricewagon.domain.product.dto.ProductDto;
 import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
-import com.pricewagon.pricewagon.domain.product.dto.response.BrandSearchResponse;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo2;
-import com.pricewagon.pricewagon.domain.product.dto.response.ProductSearchResponse;
+import com.pricewagon.pricewagon.domain.product.dto.response.ProductAndBrandSearchResponse;
 import com.pricewagon.pricewagon.domain.product.entity.Product;
 import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 import com.pricewagon.pricewagon.domain.product.repository.ProductRepository;
@@ -155,30 +155,40 @@ public class ProductService {
 		return BasicProductInfo.createHistoryOf(product, previousPrice);
 	}
 
-	@Transactional(readOnly = true)
-	public BrandSearchResponse searchBrands(String brand) {
+	public List<String> searchBrands(String brand, int size) {
 		Specification<Product> brandSpec = Specification.where(
 			ProductSpecification.hasBrand(brand)
 		);
 
-		List<String> relatedBrands = productRepository.findAll(brandSpec).stream()
+		Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.ASC, "name"));
+		Page<Product> productPage = productRepository.findAll(brandSpec, pageable);
+
+		return productPage.stream()
 			.map(Product::getBrand)
 			.distinct()
 			.toList();
+	}
 
-		return BrandSearchResponse.of(relatedBrands);
+	public List<String> searchProducts(String name, int size) {
+		Specification<Product> productNameSpec = Specification.where(
+			ProductSpecification.hasName(name)
+		);
+
+		Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.ASC, "name"));
+		Page<Product> productPage = productRepository.findAll(productNameSpec, pageable);
+
+		return productPage.stream()
+			.map(Product::getName)
+			.distinct()
+			.toList();
 	}
 
 	@Transactional(readOnly = true)
-	public ProductSearchResponse searchProducts(String name, Integer lastId, int size) {
-		List<Product> products = productRepository.findProductsByQueryAndLastId(name, lastId, size);
+	public ProductAndBrandSearchResponse searchProductsAndBrands(String name, int size) {
+		List<String> relatedProducts = searchProducts(name, size);
+		List<String> relatedBrands = searchBrands(name, size);
 
-		// DTO 변환
-		List<ProductDto> relatedProducts = products.stream()
-			.map(ProductDto::toDTO)
-			.toList();
-
-		return ProductSearchResponse.of(relatedProducts);
+		return ProductAndBrandSearchResponse.of(relatedProducts, relatedBrands);
 	}
 
 	public boolean isPriceBelowDesired(Alarm alarm) {
