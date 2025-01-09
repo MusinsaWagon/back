@@ -15,10 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pricewagon.pricewagon.domain.product.dto.request.ProductUrlRequest;
 import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
-import com.pricewagon.pricewagon.domain.product.dto.response.BrandSearchResponse;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo2;
-import com.pricewagon.pricewagon.domain.product.dto.response.ProductSearchResponse;
+import com.pricewagon.pricewagon.domain.product.dto.response.ProductAndBrandSearchResponse;
 import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 import com.pricewagon.pricewagon.domain.product.service.ProductRegistrationService;
 import com.pricewagon.pricewagon.domain.product.service.ProductService;
@@ -90,19 +89,19 @@ public class ProductController {
 
 	@Operation(summary = "브랜드 이름 검색", description = "검색 시 브랜드 이름 검색")
 	@GetMapping("/brands")
-	public BrandSearchResponse searchBrands(
-		@RequestParam(required = true) String name) {
-		return productService.searchBrands(name);
+	public List<String> searchBrands(
+		@RequestParam(required = true) String name,
+		@RequestParam(defaultValue = "10") int size) {
+		return productService.searchBrands(name, size);
 	}
 
 	@Operation(summary = "상품, 브랜드 검색", description = "상품명, 브랜드 동시 검색")
 	@GetMapping("/search")
-	public ProductSearchResponse searchProducts(
+	public ProductAndBrandSearchResponse searchProductsAndBrands(
 		@RequestParam(required = true) String name,
-		@RequestParam(required = false) Integer lastId,
 		@RequestParam(defaultValue = "10") int size
 	) {
-		return productService.searchProducts(name, lastId, size);
+		return productService.searchProductsAndBrands(name, size);
 	}
 
 	@Operation(summary = "좋아요 기준 인기 상품 조회", description = "좋아요 많이 등록한  기준 인기 상품 조회")
