@@ -14,11 +14,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pricewagon.pricewagon.domain.product.dto.request.ProductUrlRequest;
+import com.pricewagon.pricewagon.domain.product.dto.request.SearchProductsAndBrandsRequest;
 import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
-import com.pricewagon.pricewagon.domain.product.dto.response.BrandSearchResponse;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo2;
-import com.pricewagon.pricewagon.domain.product.dto.response.ProductSearchResponse;
+import com.pricewagon.pricewagon.domain.product.dto.response.KeywordAndBrandSearchResponse;
+import com.pricewagon.pricewagon.domain.product.dto.response.SearchingBrandResponse;
 import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 import com.pricewagon.pricewagon.domain.product.service.ProductRegistrationService;
 import com.pricewagon.pricewagon.domain.product.service.ProductService;
@@ -88,21 +89,36 @@ public class ProductController {
 		registrationService.registerProductURL(request);
 	}
 
-	@Operation(summary = "브랜드 이름 검색", description = "검색 시 브랜드 이름 검색")
-	@GetMapping("/brands")
-	public BrandSearchResponse searchBrands(
-		@RequestParam(required = true) String name) {
-		return productService.searchBrands(name);
-	}
-
-	@Operation(summary = "상품, 브랜드 검색", description = "상품명, 브랜드 동시 검색")
-	@GetMapping("/search")
-	public ProductSearchResponse searchProducts(
+	@Operation(summary = "브랜드 검색", description = "브랜드 검색하기")
+	@GetMapping("/{shopType}/search/brand")
+	public SearchingBrandResponse searchBrands(
+		@PathVariable ShopType shopType,
 		@RequestParam(required = true) String name,
-		@RequestParam(required = false) Integer lastId,
 		@RequestParam(defaultValue = "10") int size
 	) {
-		return productService.searchProducts(name, lastId, size);
+		List<String> brandsList = productService.searchBrandsName(shopType, name, size);
+		return SearchingBrandResponse.from(brandsList);
+	}
+
+	@Operation(summary = "검색하기", description = "상품명, 브랜드 동시 검색")
+	@GetMapping("/{shopType}/search")
+	public KeywordAndBrandSearchResponse searchProductsAndBrands(
+		@PathVariable ShopType shopType,
+		@RequestParam(required = true) String name,
+		@RequestParam(defaultValue = "10") int size
+	) {
+		return productService.searchKeywordsAndBrands(shopType, name, size);
+	}
+
+	@Operation(summary = "검색 후 관련 상품 및 브랜드 정보 요청", description = "검색 후 관련 상품 및 브랜드 세부 정보 조회")
+	@GetMapping("/{shopType}/search/detail")
+	public List<BasicProductInfo> searchProductsAndBrandsDetail(
+		@PathVariable ShopType shopType,
+		@RequestParam(required = false) Integer lastId,
+		@RequestParam(defaultValue = "10") int size,
+		@RequestBody SearchProductsAndBrandsRequest request
+	) {
+		return productService.getSearchingProductsAndBrandsDetail(shopType, request, lastId, size);
 	}
 
 	@Operation(summary = "좋아요 기준 인기 상품 조회", description = "좋아요 많이 등록한  기준 인기 상품 조회")

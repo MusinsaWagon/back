@@ -11,6 +11,8 @@ import org.springframework.data.repository.query.Param;
 import com.pricewagon.pricewagon.domain.alarm.entity.Alarm;
 import com.pricewagon.pricewagon.domain.alarm.entity.AlarmStatus;
 
+import jakarta.transaction.Transactional;
+
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 	Optional<Alarm> findById(Long alarmId);
 
@@ -24,6 +26,7 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 	List<Alarm> findActiveAlarmsWithDetails(@Param("status") AlarmStatus status);
 
 	@Modifying
+	@Transactional
 	@Query("UPDATE Alarm a SET a.status = :status WHERE a.id = :id AND a.status = :currentStatus")
 	int updateAlarmStatus(@Param("id") Long id, @Param("status") AlarmStatus status,
 		@Param("currentStatus") AlarmStatus currentStatus);
