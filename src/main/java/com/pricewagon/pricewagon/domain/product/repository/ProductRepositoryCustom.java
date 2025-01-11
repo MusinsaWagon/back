@@ -14,4 +14,6 @@ public interface ProductRepositoryCustom {
 
 	List<Product> findAlarmProductsByShopTypeAndLastId(ShopType shopType, Integer lastId, int size);
 
+	List<Product> findSearchingProductsAndBrands(ShopType shopType, String branch, String keyword, Integer lastId,
+		int size);
 }

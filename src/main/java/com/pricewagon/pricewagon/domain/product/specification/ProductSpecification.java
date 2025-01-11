@@ -3,6 +3,7 @@ package com.pricewagon.pricewagon.domain.product.specification;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.pricewagon.pricewagon.domain.product.entity.Product;
+import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 
 public final class ProductSpecification {
 
@@ -25,6 +26,20 @@ public final class ProductSpecification {
 				return builder.disjunction();
 			}
 			return builder.like(builder.lower(root.get("brand")), "%" + brand.toLowerCase() + "%");
+		};
+	}
+
+	public static Specification<Product> equalShopType(ShopType shopType) {
+		return (root, query, builder) ->
+			builder.equal(root.get("shopType"), shopType);
+	}
+
+	public static Specification<Product> gtProductId(Integer lastId) {
+		return (root, query, builder) -> {
+			if (lastId == null) {
+				return builder.conjunction();
+			}
+			return builder.greaterThan(root.get("id"), lastId);
 		};
 	}
 }
