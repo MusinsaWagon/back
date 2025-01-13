@@ -28,7 +28,7 @@ public class ProductRegistrationService {
 			throw new RuntimeException("이미 등록 된 상품입니다.");
 		}
 
-		ProductRegistration productRegistration = ProductRegistration.create(request);
+		ProductRegistration productRegistration = ProductRegistration.create(request, productNumber);
 		productRegistrationRepository.save(productRegistration);
 	}
 

@@ -33,7 +33,7 @@ public class ProductRegistration extends CreatedTimeEntity {
 	private ShopType shopType;
 
 	@Comment("상품 번호")
-	@Column(name = "product_num", unique = true)
+	@Column(name = "product_num", nullable = false, unique = true)
 	private Integer productNumber;
 
 	@Comment("등록 상품 URL")
@@ -48,18 +48,22 @@ public class ProductRegistration extends CreatedTimeEntity {
 	@Builder(access = AccessLevel.PRIVATE)
 	private ProductRegistration(
 		ShopType shopType,
-		String url
+		String url,
+		Integer productNumber
 	) {
 		this.shopType = shopType;
 		this.url = url;
+		this.productNumber = productNumber;
 		this.status = Status.PENDING;
 	}
 
 	public static ProductRegistration create(
-		ProductUrlRequest request
+		ProductUrlRequest request,
+		Integer productNumber
 	) {
 		return ProductRegistration.builder()
 			.shopType(request.shopType())
+			.productNumber(productNumber)
 			.url(request.url())
 			.build();
 	}
