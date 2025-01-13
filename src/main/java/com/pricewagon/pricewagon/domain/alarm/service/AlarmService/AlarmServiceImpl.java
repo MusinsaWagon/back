@@ -1,6 +1,6 @@
 package com.pricewagon.pricewagon.domain.alarm.service.AlarmService;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.scheduling.annotation.Scheduled;
@@ -39,101 +39,101 @@ public class AlarmServiceImpl implements AlarmService {
 	private final FirebaseMessaging firebaseMessaging;
 
 	@Override
-	@Scheduled(fixedRate = 120000) // Every 1 minute
+	@Transactional
+	@Scheduled(fixedRate = 120000)
 	public void checkAllAlarmsAndNotify() {
 		List<Alarm> activeAlarms = alarmRepository.findActiveAlarmsWithDetails(AlarmStatus.ACTIVE);
 
 		for (Alarm alarm : activeAlarms) {
-			Product product = alarm.getProduct();
-			User user = alarm.getUser();
-
-			if (productService.isPriceBelowDesired(alarm)) {
-				String messageBody =
-					product.getName() + "의 가격이 " + product.getCurrentPrice() + "원 이하로 떨어졌습니다.";
-				boolean notificationSent = sendNotification(user, messageBody);
-				if (notificationSent) {
-					updateAlarmStatus(alarm.getId(), AlarmStatus.INACTIVE, AlarmStatus.ACTIVE);
-					log.info("알림이 성공적으로 전송 후 비활성화로 저장하였습니다." + user.getAccount());
-				}
+			try {
+				processAlarm(alarm);
+			} catch (Exception e) {
+				log.error("알람 처리 중 오류 발생: alarmId={}, error={}", alarm.getId(), e.getMessage());
 			}
 		}
 	}
 
 	@Transactional
-	protected void updateAlarmStatus(Long id, AlarmStatus status, AlarmStatus currentStatus) {
-		alarmRepository.updateAlarmStatus(id, status, currentStatus);
+	protected void processAlarm(Alarm alarm) {
+		Product product = alarm.getProduct();
+		User user = alarm.getUser();
+
+		if (productService.isPriceBelowDesired(alarm)) {
+			String messageBody = String.format("%s의 가격이 %d원 이하로 떨어졌습니다.",
+				product.getName(), product.getCurrentPrice());
+
+			boolean notificationSuccess = sendNotificationToUser(user, messageBody);
+			if (notificationSuccess) {
+				alarm.setStatus(AlarmStatus.INACTIVE);
+				alarmRepository.save(alarm);
+				log.info("알림 전송 성공 후 알람 비활성화: user={}", user.getAccount());
+			}
+		}
 	}
 
 	@Transactional
-	protected boolean sendNotification(User user, String messageBody) {
-
-		List<FcmToken> fcmTokens = user.getFcmTokens();
-		if (fcmTokens == null || fcmTokens.isEmpty()) {
+	protected boolean sendNotificationToUser(User user, String messageBody) {
+		List<FcmToken> tokens = new ArrayList<>(user.getFcmTokens());
+		if (tokens.isEmpty()) {
 			log.warn("푸시 알림 전송 실패: FCM 토큰이 없습니다. 사용자: {}", user.getAccount());
 			return false;
 		}
 
-		boolean allNotificationsSent = false;
+		List<FcmToken> tokensToRemove = new ArrayList<>();
+		boolean atLeastOneSuccess = false;
 
-		log.debug("푸시 알림 전송 시작: 사용자: {}", user.getAccount());
-
-		Iterator<FcmToken> iterator = fcmTokens.iterator();
-		while (iterator.hasNext()) {
-			FcmToken token = iterator.next();
-
-			Message message = Message.builder()
-				.setToken(token.getToken())
-				.putData("title", "costFlower")
-				.putData("body", messageBody)
-				.build();
-
+		for (FcmToken token : tokens) {
 			try {
+				Message message = Message.builder()
+					.setToken(token.getToken())
+					.putData("title", "costFlower")
+					.putData("body", messageBody)
+					.build();
+
 				firebaseMessaging.send(message);
-				allNotificationsSent = true;
-				log.info("푸시 알림이 성공적으로 전송되었습니다. 사용자: {}, FCM 토큰: {}", user.getAccount(), token.getToken());
+				atLeastOneSuccess = true;
+				log.info("푸시 알림 전송 성공: user={}, token={}", user.getAccount(), token.getToken());
 			} catch (FirebaseMessagingException e) {
-				log.error("푸시 알림 전송 실패: 사용자: {}, FCM 토큰: {}, 이유: {}", user.getAccount(), token.getToken(),
-					e.getMessage());
+				log.error("푸시 알림 전송 실패: user={}, token={}, error={}",
+					user.getAccount(), token.getToken(), e.getMessage());
 
-				// UNREGISTERED 에러 처리: 무효화된 토큰 제거
 				if ("UNREGISTERED".equals(e.getMessagingErrorCode().name())) {
-					log.warn("유효하지 않은 FCM 토큰을 제거합니다. 사용자: {}, FCM 토큰: {}", user.getAccount(), token.getToken());
-					iterator.remove();
-					user.removeFcmToken(token);
+					tokensToRemove.add(token);
+					log.warn("유효하지 않은 FCM 토큰 발견: user={}, token={}",
+						user.getAccount(), token.getToken());
 				}
-
-				allNotificationsSent = false;
 			}
 		}
 
-		if (!allNotificationsSent) {
-			userRepository.save(user);
-			log.info("FCM 토큰 변경사항이 사용자 데이터베이스에 저장되었습니다. 사용자: {}", user.getAccount());
+		if (!tokensToRemove.isEmpty()) {
+			removeInvalidTokens(user, tokensToRemove);
 		}
 
-		log.debug("푸시 알림 전송 완료: 사용자: {}, 결과: {}", user.getAccount(), allNotificationsSent);
-		return allNotificationsSent;
+		return atLeastOneSuccess;
+	}
+
+	@Transactional
+	protected void removeInvalidTokens(User user, List<FcmToken> tokensToRemove) {
+		tokensToRemove.forEach(token -> {
+			user.getFcmTokens().remove(token);
+			// token.setUser(null); // 이미 CascadeType.ALL과 orphanRemoval=true로 처리됨
+		});
+		userRepository.save(user);
+		log.info("유효하지 않은 FCM 토큰들 제거 완료: user={}, removedCount={}",
+			user.getAccount(), tokensToRemove.size());
 	}
 
 	@Override
+	@Transactional
 	public AlarmResponseDTO.registerAlarmDTO registerAlarm(AlarmRequestDTO.registerAlarm request, String username) {
 		Product product = productRepository.findByProductNumber(request.getProductNumber())
 			.orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+
 		User user = userRepository.findByAccount(username)
 			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-		if (request.getFcmToken() != null && !request.getFcmToken().isEmpty()) {
-			boolean tokenExists = user.getFcmTokens().stream()
-				.anyMatch(token -> token.getToken().equals(request.getFcmToken()));
 
-			if (!tokenExists) {
-				FcmToken fcmToken = FcmToken.builder()
-					.token(request.getFcmToken())
-					.user(user)
-					.build();
-				user.addFcmToken(fcmToken);
-				userRepository.save(user);
-				log.info("새로운 FCM 토큰 저장: {}", request.getFcmToken());
-			}
+		if (request.getFcmToken() != null && !request.getFcmToken().isEmpty()) {
+			registerFcmToken(user, request.getFcmToken());
 		}
 
 		Alarm alarm = Alarm.builder()
@@ -142,6 +142,7 @@ public class AlarmServiceImpl implements AlarmService {
 			.desired_price(request.getPrice())
 			.status(AlarmStatus.ACTIVE)
 			.build();
+
 		alarmRepository.save(alarm);
 		product.updateAlarmCount(product.getAlarmCount() + 1);
 
@@ -152,4 +153,19 @@ public class AlarmServiceImpl implements AlarmService {
 			.build();
 	}
 
+	@Transactional
+	protected void registerFcmToken(User user, String tokenString) {
+		boolean tokenExists = user.getFcmTokens().stream()
+			.anyMatch(token -> token.getToken().equals(tokenString));
+
+		if (!tokenExists) {
+			FcmToken fcmToken = FcmToken.builder()
+				.token(tokenString)
+				.user(user)
+				.build();
+			user.addFcmToken(fcmToken);
+			userRepository.save(user);
+			log.info("새로운 FCM 토큰 등록: user={}, token={}", user.getAccount(), tokenString);
+		}
+	}
 }
