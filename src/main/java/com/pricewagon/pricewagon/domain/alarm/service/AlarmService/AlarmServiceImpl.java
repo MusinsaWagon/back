@@ -79,7 +79,7 @@ public class AlarmServiceImpl implements AlarmService {
 			return false;
 		}
 
-		List<FcmToken> tokensToRemove = new ArrayList<>();
+		List<FcmToken> tokensToRemove = new ArrayList<>(); // 별도의 리스트를 사용해서 삭제할 토큰 따로 저장
 		boolean atLeastOneSuccess = false;
 
 		for (FcmToken token : tokens) {
@@ -116,7 +116,7 @@ public class AlarmServiceImpl implements AlarmService {
 	protected void removeInvalidTokens(User user, List<FcmToken> tokensToRemove) {
 		tokensToRemove.forEach(token -> {
 			user.getFcmTokens().remove(token);
-			// token.setUser(null); // 이미 CascadeType.ALL과 orphanRemoval=true로 처리됨
+
 		});
 		userRepository.save(user);
 		log.info("유효하지 않은 FCM 토큰들 제거 완료: user={}, removedCount={}",
