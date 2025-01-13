@@ -32,6 +32,10 @@ public class ProductRegistration extends CreatedTimeEntity {
 	@Column(length = 50, nullable = false)
 	private ShopType shopType;
 
+	@Comment("상품 번호")
+	@Column(name = "product_num", unique = true)
+	private Integer productNumber;
+
 	@Comment("등록 상품 URL")
 	@Column(nullable = false, length = 200)
 	private String url;
