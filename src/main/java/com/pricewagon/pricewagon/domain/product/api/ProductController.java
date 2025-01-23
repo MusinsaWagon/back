@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pricewagon.pricewagon.domain.product.dto.request.ProductUrlRequest;
-import com.pricewagon.pricewagon.domain.product.dto.request.SearchProductsAndBrandsRequest;
 import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo2;
@@ -116,9 +115,10 @@ public class ProductController {
 		@PathVariable ShopType shopType,
 		@RequestParam(required = false) Integer lastId,
 		@RequestParam(defaultValue = "10") int size,
-		@RequestBody SearchProductsAndBrandsRequest request
+		@RequestParam(required = false) String keyword,
+		@RequestParam(required = false) String brand
 	) {
-		return productService.getSearchingProductsAndBrandsDetail(shopType, request, lastId, size);
+		return productService.getSearchingProductsAndBrandsDetail(shopType, keyword, brand, lastId, size);
 	}
 
 	@Operation(summary = "좋아요 기준 인기 상품 조회", description = "좋아요 많이 등록한  기준 인기 상품 조회")

@@ -15,7 +15,6 @@ import com.pricewagon.pricewagon.domain.category.entity.Category;
 import com.pricewagon.pricewagon.domain.category.service.CategoryService;
 import com.pricewagon.pricewagon.domain.history.service.ProductHistoryService;
 import com.pricewagon.pricewagon.domain.likes.repository.LikeRepository;
-import com.pricewagon.pricewagon.domain.product.dto.request.SearchProductsAndBrandsRequest;
 import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo2;
@@ -52,10 +51,8 @@ public class ProductService {
 	// 검색 후 상품 및 브랜드 리스트 조회
 	@Transactional(readOnly = true)
 	public List<BasicProductInfo> getSearchingProductsAndBrandsDetail(ShopType shopType,
-		SearchProductsAndBrandsRequest request, Integer lastId,
+		String keyword, String brand, Integer lastId,
 		int size) {
-		String brand = request.brand();
-		String keyword = request.keyword();
 
 		if (brand != null && !brand.isBlank() && (keyword == null || keyword.isBlank())) {
 			List<Product> relatedProducts = searchProductByBrands(shopType, brand, size);
