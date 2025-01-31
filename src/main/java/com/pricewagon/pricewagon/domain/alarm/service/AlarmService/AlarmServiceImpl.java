@@ -10,12 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
+import com.pricewagon.pricewagon.domain.alarm.converter.AlarmConverter;
 import com.pricewagon.pricewagon.domain.alarm.dto.AlarmRequestDTO;
 import com.pricewagon.pricewagon.domain.alarm.dto.AlarmResponseDTO;
 import com.pricewagon.pricewagon.domain.alarm.entity.Alarm;
 import com.pricewagon.pricewagon.domain.alarm.entity.AlarmStatus;
 import com.pricewagon.pricewagon.domain.alarm.repository.AlarmRepository;
 import com.pricewagon.pricewagon.domain.fcm.entity.FcmToken;
+import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
 import com.pricewagon.pricewagon.domain.product.entity.Product;
 import com.pricewagon.pricewagon.domain.product.repository.ProductRepository;
 import com.pricewagon.pricewagon.domain.product.service.ProductService;
@@ -37,6 +39,7 @@ public class AlarmServiceImpl implements AlarmService {
 	private final AlarmRepository alarmRepository;
 	private final ProductRepository productRepository;
 	private final FirebaseMessaging firebaseMessaging;
+	private final AlarmConverter alarmConverter;
 
 	@Override
 	@Transactional
@@ -167,5 +170,16 @@ public class AlarmServiceImpl implements AlarmService {
 			userRepository.save(user);
 			log.info("새로운 FCM 토큰 등록: user={}, token={}", user.getAccount(), tokenString);
 		}
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<BasicProductInfo> getAlarmList(String username) {
+		User user = userRepository.findByAccount(username)
+			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+		List<Alarm> alarms = alarmRepository.findByUserId(user.getId());
+
+		return alarmConverter.convertToBasicProductInfo(alarms);
 	}
 }

@@ -31,6 +31,8 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 	int updateAlarmStatus(@Param("id") Long id, @Param("status") AlarmStatus status,
 		@Param("currentStatus") AlarmStatus currentStatus);
 
+	List<Alarm> findByUserId(Long userId);
+
 }
 
 
