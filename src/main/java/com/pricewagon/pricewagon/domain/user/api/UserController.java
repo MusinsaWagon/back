@@ -1,6 +1,7 @@
 package com.pricewagon.pricewagon.domain.user.api;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +15,7 @@ import com.pricewagon.pricewagon.domain.user.dto.UserResponseDTO;
 import com.pricewagon.pricewagon.domain.user.entity.User;
 import com.pricewagon.pricewagon.domain.user.service.EmailService;
 import com.pricewagon.pricewagon.domain.user.service.UserCommandService;
+import com.pricewagon.pricewagon.global.config.security.CustomUserDetails;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -92,6 +94,15 @@ public class UserController {
 	public ResponseEntity<UserResponseDTO.loginResultDTO> naverLogin(@RequestParam("code") String accessCode,
 		HttpServletResponse httpServletResponse) {
 		UserResponseDTO.loginResultDTO result = userCommandService.oAuthNaverLogin(accessCode, httpServletResponse);
+		return ResponseEntity.ok(result);
+	}
+
+	//마이페이지 조회
+	@Operation(summary = "마이페이지 조회", description = "이름, 이메일 값 조회")
+	@GetMapping("/mypage")
+	public ResponseEntity<UserResponseDTO.myPageResultDTO> mypage(
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
+		UserResponseDTO.myPageResultDTO result = userCommandService.mypage(userDetails);
 		return ResponseEntity.ok(result);
 	}
 
