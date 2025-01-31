@@ -11,6 +11,7 @@ import com.pricewagon.pricewagon.domain.user.dto.UserRequestDTO;
 import com.pricewagon.pricewagon.domain.user.dto.UserResponseDTO;
 import com.pricewagon.pricewagon.domain.user.entity.User;
 import com.pricewagon.pricewagon.domain.user.repository.UserRepository;
+import com.pricewagon.pricewagon.global.config.security.CustomUserDetails;
 import com.pricewagon.pricewagon.global.config.security.JwtUtil;
 import com.pricewagon.pricewagon.global.config.security.KakaoUtil;
 import com.pricewagon.pricewagon.global.config.security.NaverUtil;
@@ -88,6 +89,14 @@ public class UserCommandServiceImpl implements UserCommandService {
 			.orElseGet(() -> createNewUser(userInfo));
 		String token = jwtUtil.createAccessToken(UserConverter.toCustomUserInfoDto(user));
 		return UserConverter.loginResult(user, token);
+	}
+
+	@Override
+	public UserResponseDTO.myPageResultDTO mypage(CustomUserDetails userDetails) {
+		User user = userRepository.findByAccount(userDetails.getUsername())
+			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+		return UserConverter.toMyPageResult(user);
+
 	}
 
 	private User createNewUser(KakaoDTO.KakaoProfile kakaoProfile) {

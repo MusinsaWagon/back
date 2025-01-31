@@ -55,4 +55,12 @@ public class UserResponseDTO {
 		boolean isValid;
 	}
 
+	@Builder
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class myPageResultDTO {
+		String email;
+	}
+
 }

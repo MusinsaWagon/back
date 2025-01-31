@@ -81,4 +81,10 @@ public class UserConverter {
 			.build();
 	}
 
+	public static UserResponseDTO.myPageResultDTO toMyPageResult(User user) {
+		return UserResponseDTO.myPageResultDTO.builder()
+			.email(user.getAccount())
+			.build();
+	}
+
 }
