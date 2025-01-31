@@ -1,13 +1,17 @@
 package com.pricewagon.pricewagon.domain.likes.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.pricewagon.pricewagon.domain.likes.converter.LikeConverter;
 import com.pricewagon.pricewagon.domain.likes.dto.LikeResponseDTO;
 import com.pricewagon.pricewagon.domain.likes.entity.Likes;
 import com.pricewagon.pricewagon.domain.likes.repository.LikeRepository;
+import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
 import com.pricewagon.pricewagon.domain.product.entity.Product;
 import com.pricewagon.pricewagon.domain.product.repository.ProductRepository;
 import com.pricewagon.pricewagon.domain.user.entity.User;
@@ -25,6 +29,7 @@ public class LikeServiceImpl implements LikeService {
 	private final LikeRepository likeRepository;
 	private final UserRepository userRepository;
 	private final ProductRepository productRepository;
+	private final LikeConverter likeConverter;
 
 	@Override
 	public LikeResponseDTO.registerLikeDTO registerLike(Integer productNumber, String username) {
@@ -35,7 +40,7 @@ public class LikeServiceImpl implements LikeService {
 			.orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
 
 		Optional<Likes> like = likeRepository.findByUserAndProduct(user, product);
-		if (like.isPresent()) { // 좋아요 삭제
+		if (like.isPresent()) {
 			likeRepository.delete(like.get());
 			product.updateLikeCount(product.getLikeCount() - 1);
 			return LikeResponseDTO.registerLikeDTO.builder()
@@ -58,6 +63,17 @@ public class LikeServiceImpl implements LikeService {
 				.build();
 		}
 
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<BasicProductInfo> getLikeList(String username) {
+		User user = userRepository.findByAccount(username)
+			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+		List<Likes> likes = likeRepository.findByUserId(user.getId());
+
+		return likeConverter.convertToBasicProductInfo(likes);
 	}
 
 }

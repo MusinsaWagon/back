@@ -21,7 +21,7 @@ public class FCMConfig {
 
 	@Bean
 	public FirebaseMessaging firebaseMessaging() throws IOException {
-		// 경로 수정: "resources/" 생략
+
 		ClassPathResource resource = new ClassPathResource(
 			"firebase/fcm.json");
 		InputStream refreshToken = resource.getInputStream();

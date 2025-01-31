@@ -50,4 +50,5 @@ public record BasicProductInfo(
 			isLiked
 		);
 	}
+
 }
