@@ -1,7 +1,10 @@
 package com.pricewagon.pricewagon.domain.alarm.api;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pricewagon.pricewagon.domain.alarm.dto.AlarmRequestDTO;
 import com.pricewagon.pricewagon.domain.alarm.dto.AlarmResponseDTO;
 import com.pricewagon.pricewagon.domain.alarm.service.AlarmService.AlarmService;
+import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
 import com.pricewagon.pricewagon.global.config.security.CustomUserDetails;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,6 +34,14 @@ public class AlarmController {
 		@AuthenticationPrincipal CustomUserDetails userDetails) {
 		AlarmResponseDTO.registerAlarmDTO result = alarmService.registerAlarm(request, userDetails.getUsername());
 		return ResponseEntity.ok(result);
+	}
+
+	@Operation(summary = "알람 목록 조회", description = "알람 목록 조회하는 기능(토큰 필요)")
+	@GetMapping("/list")
+	public List<BasicProductInfo> getAlarmList(
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
+		return alarmService.getAlarmList(userDetails.getUsername());
+
 	}
 
 }
