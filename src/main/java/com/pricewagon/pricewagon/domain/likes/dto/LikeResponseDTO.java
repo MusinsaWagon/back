@@ -15,4 +15,5 @@ public class LikeResponseDTO {
 		Long userId;
 		String action; // 좋아요 등록, 좋아요 삭제
 	}
+
 }
