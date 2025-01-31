@@ -35,6 +35,14 @@ jobs:
       #          ENV: ${{ secrets.FCM }}
       #        shell: bash
 
+      - name: FCM 파일 생성
+        run: |
+          mkdir -p src/main/resources/firebase
+          echo "$FCM" > src/main/resources/firebase/fcm.json
+        env:
+          FCM: ${{ secrets.FCM }}
+        shell: bash
+
       - name: Gradle 권한 부여
         run: chmod +x gradlew
 
@@ -84,4 +92,3 @@ jobs:
             chown -R $USER:$USER /home/hong/app/pricewagon-blue-green/data/certbot
             chmod -R 755 /home/hong/app/pricewagon-blue-green/data/certbot
             ./blue-green-deploy.sh
-

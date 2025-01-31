@@ -15,11 +15,10 @@ import com.pricewagon.pricewagon.domain.category.entity.Category;
 import com.pricewagon.pricewagon.domain.category.service.CategoryService;
 import com.pricewagon.pricewagon.domain.history.service.ProductHistoryService;
 import com.pricewagon.pricewagon.domain.likes.repository.LikeRepository;
-import com.pricewagon.pricewagon.domain.product.dto.ProductDto;
 import com.pricewagon.pricewagon.domain.product.dto.response.BasicProductInfo;
-import com.pricewagon.pricewagon.domain.product.dto.response.BrandSearchResponse;
 import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo;
-import com.pricewagon.pricewagon.domain.product.dto.response.ProductSearchResponse;
+import com.pricewagon.pricewagon.domain.product.dto.response.IndividualProductInfo2;
+import com.pricewagon.pricewagon.domain.product.dto.response.KeywordAndBrandSearchResponse;
 import com.pricewagon.pricewagon.domain.product.entity.Product;
 import com.pricewagon.pricewagon.domain.product.entity.type.ShopType;
 import com.pricewagon.pricewagon.domain.product.repository.ProductRepository;
@@ -46,12 +45,24 @@ public class ProductService {
 	@Transactional(readOnly = true)
 	public List<BasicProductInfo> getProductsByShopType(ShopType shopType, Integer lastId, int size) {
 		List<Product> products = productRepository.findProductsByShopTypeAndLastId(shopType, lastId, size);
-		return products.stream()
-			.map(product -> {
-				Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
-				return BasicProductInfo.createHistoryOf(product, previousPrice);
-			})
-			.toList();
+		return convertToBasciProductInfo(products);
+	}
+
+	// 검색 후 상품 및 브랜드 리스트 조회
+	@Transactional(readOnly = true)
+	public List<BasicProductInfo> getSearchingProductsAndBrandsDetail(ShopType shopType,
+		String keyword, String brand, Integer lastId,
+		int size) {
+
+		if (brand != null && !brand.isBlank() && (keyword == null || keyword.isBlank())) {
+			List<Product> relatedProducts = searchProductByBrands(shopType, brand, size);
+			return convertToBasciProductInfo(relatedProducts);
+		}
+
+		List<Product> relatedProducts = productRepository.findSearchingProductsAndBrands(shopType, brand, keyword,
+			lastId,
+			size);
+		return convertToBasciProductInfo(relatedProducts);
 	}
 
 	// 좋아요 기반으로 인기 상품 조회
@@ -59,13 +70,7 @@ public class ProductService {
 	public List<BasicProductInfo> getPopularProducts(ShopType shopType, Integer lastId, int size) {
 		List<Product> popularProducts = productRepository.findPopularProductsByShopTypeAndLastId(shopType, lastId,
 			size);
-
-		return popularProducts.stream()
-			.map(product -> {
-				Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
-				return BasicProductInfo.createHistoryOf(product, previousPrice);
-			})
-			.toList();
+		return convertToBasciProductInfo(popularProducts);
 	}
 
 	// 알람 기반으로 인기 상품 조회
@@ -73,12 +78,8 @@ public class ProductService {
 	public List<BasicProductInfo> getPopularProductsByAlarm(ShopType shopType, Integer lastId, int size) {
 		List<Product> popularProducts = productRepository.findAlarmProductsByShopTypeAndLastId(shopType, lastId,
 			size);
-		return popularProducts.stream()
-			.map(product -> {
-				Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
-				return BasicProductInfo.createHistoryOf(product, previousPrice);
-			})
-			.toList();
+		return convertToBasciProductInfo(popularProducts);
+
 	}
 
 	// 개별 상품 정보 조회
@@ -103,6 +104,26 @@ public class ProductService {
 		BasicProductInfo basicProductInfo = BasicProductInfo.createWithLikeStatus(product, previousPrice, isLiked);
 
 		return IndividualProductInfo.from(
+			product,
+			basicProductInfo,
+			parentAndChildCategoryDTO
+		);
+	}
+
+	// 개별 상품 정보 조회
+	@Transactional(readOnly = true)
+	public IndividualProductInfo2 getIndividualProductInfo2(ShopType shopType, Integer productNumber) {
+		Product product = productRepository.findByShopTypeAndProductNumber(shopType, productNumber)
+			.orElseThrow(() -> new RuntimeException("존재하지 않는 상품입니다."));
+
+		Category childCategory = product.getCategory();
+		ParentAndChildCategoryDTO parentAndChildCategoryDTO = categoryService
+			.getParentAndChildCategoryByChildId(childCategory.getId());
+
+		Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
+		BasicProductInfo basicProductInfo = BasicProductInfo.createHistoryOf(product, previousPrice);
+
+		return IndividualProductInfo2.from(
 			product,
 			basicProductInfo,
 			parentAndChildCategoryDTO
@@ -135,29 +156,48 @@ public class ProductService {
 	}
 
 	@Transactional(readOnly = true)
-	public BrandSearchResponse searchBrands(String brand) {
-		Specification<Product> brandSpec = Specification.where(
-			ProductSpecification.hasBrand(brand)
-		);
+	public KeywordAndBrandSearchResponse searchKeywordsAndBrands(ShopType shopType, String name, int size) {
+		List<String> relatedKeywords = searchProductNames(shopType, name, size);
+		List<String> relatedBrands = searchBrandsName(shopType, name, size);
 
-		List<String> relatedBrands = productRepository.findAll(brandSpec).stream()
+		return KeywordAndBrandSearchResponse.of(relatedBrands, relatedKeywords);
+	}
+
+	public List<String> searchBrandsName(ShopType shopType, String brand, int size) {
+		List<Product> productList = searchProductByBrands(shopType, brand, size);
+		return productList.stream()
 			.map(Product::getBrand)
 			.distinct()
 			.toList();
-
-		return BrandSearchResponse.of(relatedBrands);
 	}
 
-	@Transactional(readOnly = true)
-	public ProductSearchResponse searchProducts(String name, Integer lastId, int size) {
-		List<Product> products = productRepository.findProductsByQueryAndLastId(name, lastId, size);
+	private List<Product> searchProductByBrands(ShopType shopType, String brand, int size) {
+		Specification<Product> brandSpec = Specification.where(ProductSpecification.hasBrand(brand))
+			.and(ProductSpecification.equalShopType(shopType));
 
-		// DTO 변환
-		List<ProductDto> relatedProducts = products.stream()
-			.map(ProductDto::toDTO)
+		List<Product> productList = productRepository.findAll(brandSpec);
+
+		return productList.stream()
+			.distinct()
+			.limit(size)
 			.toList();
+	}
 
-		return ProductSearchResponse.of(relatedProducts);
+	private List<Product> searchProductsByName(ShopType shopType, String name, int size) {
+		Specification<Product> productNameSpec = Specification.where(
+			ProductSpecification.hasName(name)
+		).and(ProductSpecification.equalShopType(shopType));
+		List<Product> productList = productRepository.findAll(productNameSpec);
+		return productList.stream()
+			.limit(size)
+			.toList();
+	}
+
+	private List<String> searchProductNames(ShopType shopType, String name, int size) {
+		List<Product> searchProducts = searchProductsByName(shopType, name, size);
+		return searchProducts.stream()
+			.map(Product::getBrand)
+			.toList();
 	}
 
 	public boolean isPriceBelowDesired(Alarm alarm) {
@@ -167,4 +207,14 @@ public class ProductService {
 			.getCurrentPrice();
 		return currentPrice <= alarm.getDesired_price();
 	}
+
+	private List<BasicProductInfo> convertToBasciProductInfo(List<Product> products) {
+		return products.stream()
+			.map(product -> {
+				Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
+				return BasicProductInfo.createHistoryOf(product, previousPrice);
+			})
+			.toList();
+	}
+
 }

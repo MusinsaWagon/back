@@ -21,10 +21,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
 	@Override
 	public List<Product> findProductsByShopTypeAndLastId(ShopType shopType, Integer lastId, int size) {
-		// QueryDSL을 사용하여 동적 쿼리 작성 및 실행
 		return jpaQueryFactory
 			.selectFrom(product)
-			.where(gtProductId(lastId))
+			.where(
+				gtProductId(lastId),
+				eqShopType(shopType)
+			)
 			.orderBy(product.id.asc()) // id 기준 오름차순 정렬
 			.limit(size) // 페이지 크기 설정
 			.fetch();
@@ -32,14 +34,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
 	@Override
 	public List<Product> findProductsByQueryAndLastId(String name, Integer lastId, int size) {
-		// QueryDSL 필터링 적용
-		BooleanExpression conditions = createSearchCondition(name);
 
 		return jpaQueryFactory
 			.selectFrom(product)
 			.where(
 				gtProductId(lastId),
-				conditions
+				createSearchCondition(name)
 			)
 			.orderBy(product.id.asc())
 			.limit(size)
@@ -50,7 +50,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 	public List<Product> findPopularProductsByShopTypeAndLastId(ShopType shopType, Integer lastId, int size) {
 		return jpaQueryFactory
 			.selectFrom(product)
-			.where(product.shopType.eq(shopType),
+
+			.where(eqShopType(shopType),
+
 				lastId != null ? product.id.lt(lastId) : null)
 			.orderBy(product.userLikeCount.desc(), product.id.desc())
 			.limit(size)
@@ -61,11 +63,43 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 	public List<Product> findAlarmProductsByShopTypeAndLastId(ShopType shopType, Integer lastId, int size) {
 		return jpaQueryFactory
 			.selectFrom(product)
-			.where(product.shopType.eq(shopType),
+
+			.where(
+				eqShopType(shopType),
+
 				lastId != null ? product.id.lt(lastId) : null)
 			.orderBy(product.alarmCount.desc(), product.id.desc())
 			.limit(size)
 			.fetch();
+	}
+
+	@Override
+	public List<Product> findSearchingProductsAndBrands(ShopType shopType, String brand, String keyword,
+		Integer lastId, int size) {
+		return jpaQueryFactory
+			.selectFrom(product)
+			.where(
+				gtProductId(lastId),
+				cotainsIgnoreBrand(brand),
+				containsIgnoreName(keyword)
+			)
+			.orderBy(product.id.asc()) // id 기준 오름차순 정렬
+			.limit(size) // 페이지 크기 설정
+			.fetch();
+	}
+
+	private BooleanExpression cotainsIgnoreBrand(String brand) {
+		if (brand == null || brand.isBlank()) {
+			return null;
+		}
+		return (product.brand.containsIgnoreCase(brand));
+	}
+
+	private BooleanExpression containsIgnoreName(String name) {
+		if (name == null || name.isBlank()) {
+			return null;
+		}
+		return (product.name.containsIgnoreCase(name));
 	}
 
 	private BooleanExpression createSearchCondition(String query) {
@@ -76,6 +110,10 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 		// 검색어를 이름과 브랜드 모두에 적용
 		return product.name.containsIgnoreCase(query)
 			.or(product.brand.containsIgnoreCase(query));
+	}
+
+	private BooleanExpression eqShopType(ShopType shopType) {
+		return product.shopType.eq(shopType);
 	}
 
 	private BooleanExpression gtProductId(Integer lastProductId) {

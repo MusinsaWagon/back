@@ -44,3 +44,5 @@ out/
 application.properties
 
 /src/main/resources/*.yml
+
+/src/main/resources/firebase

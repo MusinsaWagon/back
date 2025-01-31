@@ -22,7 +22,9 @@ public interface ProductRepository extends JpaRepository<Product, Integer>, Prod
 
 	boolean existsByProductNumber(Integer productNumber);
 
-	List<Product> findByNameOrBrandContainingIgnoreCase(String name, String brand);
+	Optional<Product> findById(Long id);
+
+	Optional<Product> findByProductNumber(Integer productNumber);
 
 	Optional<Product> findById(Long id);
 
