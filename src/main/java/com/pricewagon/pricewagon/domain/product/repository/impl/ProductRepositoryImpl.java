@@ -51,7 +51,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 		return jpaQueryFactory
 			.selectFrom(product)
 			.where(eqShopType(shopType),
-				lastId != null ? product.id.lt(lastId) : null)
+				gtProductId(lastId))
 			.orderBy(product.userLikeCount.desc(), product.id.desc())
 			.limit(size)
 			.fetch();
@@ -63,7 +63,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 			.selectFrom(product)
 			.where(
 				eqShopType(shopType),
-				lastId != null ? product.id.lt(lastId) : null)
+				gtProductId(lastId))
 			.orderBy(product.alarmCount.desc(), product.id.desc())
 			.limit(size)
 			.fetch();
