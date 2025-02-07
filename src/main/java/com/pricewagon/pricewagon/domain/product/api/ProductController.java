@@ -41,10 +41,11 @@ public class ProductController {
 	public List<BasicProductInfo> getProductsByShopType(
 		@PathVariable ShopType shopType,
 		@RequestParam(required = false) Integer lastId,
-		@RequestParam(defaultValue = "10") int size
+		@RequestParam(defaultValue = "10") int size,
+		@AuthenticationPrincipal UserDetails userDetails
 
 	) {
-		return productService.getProductsByShopType(shopType, lastId, size);
+		return productService.getProductsByShopType(shopType, lastId, size, userDetails);
 	}
 
 	@Operation(summary = "개별 상품 정보 조회", description = "특정 상품에 대한 정보")
@@ -54,11 +55,7 @@ public class ProductController {
 		@PathVariable Integer productNumber,
 		@AuthenticationPrincipal UserDetails userDetails
 	) {
-		if (userDetails != null) {
-			return productService.getIndividualProductInfo(shopType, productNumber, userDetails);
-		} else {
-			return productService.getIndividualProductInfo(shopType, productNumber, null);
-		}
+		return productService.getIndividualProductInfo(shopType, productNumber, userDetails);
 	}
 
 	@Operation(summary = "개별 상품 정보 조회 옛 버전", description = "이건 사용 안하는 API 입니다. 포폴 업데이트 후 삭제 예정")
@@ -126,9 +123,10 @@ public class ProductController {
 	public List<BasicProductInfo> getPopularProducts(
 		@PathVariable ShopType shopType,
 		@RequestParam(required = false) Integer lastId,
-		@RequestParam(defaultValue = "10") int size
+		@RequestParam(defaultValue = "10") int size,
+		@AuthenticationPrincipal UserDetails userDetails
 	) {
-		return productService.getPopularProducts(shopType, lastId, size);
+		return productService.getPopularProducts(shopType, lastId, size, userDetails);
 	}
 
 	@Operation(summary = "알람 기준 인기 상품 조회", description = "알람 많이 등록한  기준 인기 상품 조회")
@@ -136,9 +134,11 @@ public class ProductController {
 	public List<BasicProductInfo> getAlarmProducts(
 		@PathVariable ShopType shopType,
 		@RequestParam(required = false) Integer lastId,
-		@RequestParam(defaultValue = "10") int size
+		@RequestParam(defaultValue = "10") int size,
+		@AuthenticationPrincipal UserDetails userDetails
 	) {
-		return productService.getPopularProductsByAlarm(shopType, lastId, size);
+		return productService.getPopularProductsByAlarm(shopType, lastId, size, userDetails);
+
 	}
 
 }
