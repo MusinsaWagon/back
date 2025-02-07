@@ -1,6 +1,7 @@
 package com.pricewagon.pricewagon.domain.product.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,9 +44,18 @@ public class ProductService {
 
 	// 쇼핑몰에 따른 상품 리스트 조회
 	@Transactional(readOnly = true)
-	public List<BasicProductInfo> getProductsByShopType(ShopType shopType, Integer lastId, int size) {
-		List<Product> products = productRepository.findProductsByShopTypeAndLastId(shopType, lastId, size);
-		return convertToBasciProductInfo(products);
+	public List<BasicProductInfo> getProductsByShopType(ShopType shopType, Integer lastId, int size,
+		UserDetails userDetails) {
+		if (userDetails == null) {
+			List<Product> products = productRepository.findProductsByShopTypeAndLastId(shopType, lastId, size);
+			return convertToBasciProductInfo(products);
+		} else {
+			User user = userRepository.findByAccount(userDetails.getUsername())
+				.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+			List<Product> products = productRepository.findProductsByShopTypeAndLastId(shopType, lastId, size);
+			return convertToBasciProductInfo(products, user);
+		}
+
 	}
 
 	// 검색 후 상품 및 브랜드 리스트 조회
@@ -67,18 +77,32 @@ public class ProductService {
 
 	// 좋아요 기반으로 인기 상품 조회
 	@Transactional(readOnly = true)
-	public List<BasicProductInfo> getPopularProducts(ShopType shopType, Integer lastId, int size) {
+	public List<BasicProductInfo> getPopularProducts(ShopType shopType, Integer lastId, int size,
+		UserDetails userDetails) {
+		User user = Optional.ofNullable(userDetails)
+			.map(UserDetails::getUsername)
+			.map(username -> userRepository.findByAccount(username)
+				.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)))
+			.orElse(null);
 		List<Product> popularProducts = productRepository.findPopularProductsByShopTypeAndLastId(shopType, lastId,
 			size);
-		return convertToBasciProductInfo(popularProducts);
+		return user != null ? convertToBasciProductInfo(popularProducts, user)
+			: convertToBasciProductInfo(popularProducts);
 	}
-
+	
 	// 알람 기반으로 인기 상품 조회
 	@Transactional(readOnly = true)
-	public List<BasicProductInfo> getPopularProductsByAlarm(ShopType shopType, Integer lastId, int size) {
-		List<Product> popularProducts = productRepository.findAlarmProductsByShopTypeAndLastId(shopType, lastId,
-			size);
-		return convertToBasciProductInfo(popularProducts);
+	public List<BasicProductInfo> getPopularProductsByAlarm(ShopType shopType, Integer lastId, int size,
+		UserDetails userDetails) {
+		User user = Optional.ofNullable(userDetails)
+			.map(UserDetails::getUsername)
+			.map(username -> userRepository.findByAccount(username)
+				.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)))
+			.orElse(null);
+
+		List<Product> popularProducts = productRepository.findAlarmProductsByShopTypeAndLastId(shopType, lastId, size);
+		return user != null ? convertToBasciProductInfo(popularProducts, user)
+			: convertToBasciProductInfo(popularProducts);
 	}
 
 	// 개별 상품 정보 조회
@@ -212,6 +236,16 @@ public class ProductService {
 			.map(product -> {
 				Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
 				return BasicProductInfo.createHistoryOf(product, previousPrice);
+			})
+			.toList();
+	}
+
+	private List<BasicProductInfo> convertToBasciProductInfo(List<Product> products, User user) {
+		return products.stream()
+			.map(product -> {
+				boolean isLiked = likeRepository.existsByUserAndProduct(user, product);
+				Integer previousPrice = productHistoryService.getDifferentLatestPriceByProductId(product);
+				return BasicProductInfo.createWithLikeStatus(product, previousPrice, isLiked);
 			})
 			.toList();
 	}
