@@ -11,5 +11,4 @@ public class PricewagonApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(PricewagonApplication.class, args);
 	}
-
 }
